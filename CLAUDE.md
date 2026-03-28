@@ -1,0 +1,123 @@
+# PrognosisMeta - Claude Code Reference
+
+## Application Overview
+
+**PrognosisMeta** is a publication-quality browser-based meta-analysis application.
+
+- **Status:** 10/10 Editorial Quality, R VALIDATED
+- **Tests:** 35/35 passing
+- **R Validation:** 93.3% exact match with metafor
+- **Total Code:** 29,770 lines JavaScript
+
+## Quick Commands
+
+```bash
+# Open Application
+cmd /c start "" "C:\Users\user\prognostic-meta\index.html"
+
+# Run Tests
+node C:/Users/user/test_prognostic_v2.js
+
+# Run R Validation
+node C:/Users/user/prognostic_r_validation.js
+```
+
+## Key Files
+
+| File | Purpose |
+|------|---------|
+| `index.html` | Main application |
+| `js/meta-analysis.js` | Core MA (5,649 lines) |
+| `js/bayesian.js` | MCMC + Turner priors |
+| `js/selection-models.js` | Publication bias models |
+| `js/code-generators.js` | R/Stata/Python export |
+| `docs/DOCUMENTATION.md` | Full technical docs |
+| `docs/R_VALIDATION_RESULTS.md` | R validation report |
+| `SESSION_SUMMARY.md` | Session history |
+| `SESSION_JANUARY_4_2026.md` | Detailed session log |
+
+## Key Functions
+
+```javascript
+// Core meta-analysis
+MetaAnalysis.randomEffects(effects, variances, 'REML')
+MetaAnalysis.randomEffectsHKSJ(effects, variances, 'DL')  // Use this for HKSJ!
+MetaAnalysis.calculateQ(effects, variances)
+MetaAnalysis.trimAndFill(effects, variances)  // Note: trimAndFill not trimFill
+MetaAnalysis.eggerTest(effects, variances)
+
+// Bayesian
+BayesianMA.TurnerPriors.getPrior('mortality', 'pharmacological')
+
+// Selection models
+SelectionModels.multiModelInference(data, options)
+
+// Code export
+CodeGenerators.generateRCode(data, settings)
+```
+
+## Important Technical Notes
+
+1. **HKSJ Adjustment**: Use `randomEffectsHKSJ()` not `randomEffects()` with options
+   - t-based CI is in `result.ci.lower` / `result.ci.upper`
+   - z-based CI is in `result.ci_lower` / `result.ci_upper`
+
+2. **Node.js Module Loading**: Must replace const for vm.runInContext:
+   ```javascript
+   code = code.replace(/^const (ModuleName)\s*=/gm, '$1 =');
+   ```
+
+3. **tau² Estimators**: DL, REML, ML, PM, HS, SJ, HE, EB (all 8 implemented)
+
+## R Reference Values (for validation)
+
+```r
+# Dataset 2 (heterogeneous, k=8)
+yi <- c(0.2, 0.5, 0.8, 0.3, 1.2, 0.1, 0.9, 0.4)
+vi <- c(0.03, 0.04, 0.02, 0.05, 0.03, 0.06, 0.02, 0.04)
+
+# Expected results (DL):
+# Effect: 0.572197, SE: 0.134188, tau²: 0.108963, I²: 77.18%, Q: 30.668
+
+# Expected HKSJ CI: [0.252893, 0.891501]
+```
+
+## Session History
+
+- **Jan 3, 2026**: 137+ bugs fixed, code export added, Turner priors, multi-model inference
+- **Jan 4, 2026**: Full R validation (93.3% match), Editorial review (ACCEPT)
+
+## Workflow Rules (from 1,600+ message usage analysis)
+
+### Test-First Verification (CRITICAL)
+- **Never say "done" without test verification.** After any round of fixes, run the full test suite and report pass/fail counts before declaring complete.
+- **Test each feature immediately upon implementation** — do not batch test runs at the end.
+- If fixes introduce new failures, fix those too before declaring done. Track fixes with IDs (e.g., P0-1, P1-3).
+
+### Data Model Verification Before Implementation
+- **Before implementing any feature**, grep the codebase for all data objects/structures related to that feature. Verify actual property names, types, and where they are set.
+- **Never guess property names or element IDs.** Confirm properties exist in the actual data model before writing access paths.
+
+### Context Persistence
+- **Save review findings to files** (e.g., `review-findings.md`) so they persist across sessions.
+- **Never report features as "missing" without evidence.** Search thoroughly with Grep before claiming a feature is absent.
+
+### Data Integrity
+Never fabricate or hallucinate identifiers (NCT IDs, DOIs, trial names, PMIDs). If you don't have the real identifier, say so and ask the user to provide it. Always verify identifiers against existing data files before using them in configs or gold standards.
+
+### Multi-Persona Reviews
+When running multi-persona reviews, run agents sequentially (not in parallel) to avoid rate limits and empty agent outputs. If an agent returns empty output, immediately retry it before moving on. Never launch more than 2 sub-agents simultaneously.
+
+### Fix Completeness
+When asked to "fix all issues", fix ALL identified issues in a single pass — do not stop partway. After applying fixes, re-run the relevant tests/validation before reporting completion. If fixes introduce new failures, fix those too before declaring done.
+
+### Scope Discipline
+Stay focused on the specific files and scope the user requests. Do not survey or analyze files outside the stated scope. When editing files, triple-check you are editing the correct file path — never edit a stale copy or wrong directory.
+
+### Regression Prevention
+Before applying optimization changes to extraction or analysis pipelines, save a snapshot of current accuracy metrics. After each change, compare against the snapshot. If any trial/metric regresses by more than 2%, immediately rollback and try a different approach. Never apply aggressive heuristics without isolated testing first.
+
+### Test Infrastructure Stability
+- Run browser tests **sequentially**, never in parallel (prevents port conflicts).
+- If ChromeDriver/Playwright crashes, try Edge as fallback. Clear browser cache between runs.
+- Set a test timeout (60s per test) so hung browsers don't block the suite.

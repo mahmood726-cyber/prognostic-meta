@@ -1,0 +1,86 @@
+{
+  "dataset": "BCG Vaccine Trials (dat.bcg from metafor)",
+  "n_studies": 13,
+  "outcome": "Log Risk Ratio",
+  "random_effects": {
+    "DL": {
+      "estimate": -0.7141,
+      "se": 0.1787,
+      "ci_lb": -1.0644,
+      "ci_ub": -0.3638,
+      "tau2": 0.3088,
+      "I2": 92.1173,
+      "Q": 152.233
+    },
+    "REML": {
+      "estimate": -0.7145,
+      "tau2": 0.3132
+    },
+    "PM": {
+      "estimate": -0.715,
+      "tau2": 0.3181
+    },
+    "ML": {
+      "estimate": -0.7112,
+      "tau2": 0.28
+    },
+    "HS": {
+      "estimate": -0.7045,
+      "tau2": 0.2284
+    },
+    "SJ": {
+      "estimate": -0.7172,
+      "tau2": 0.3455
+    },
+    "HE": {
+      "estimate": -0.7159,
+      "tau2": 0.3286
+    },
+    "EB": {
+      "estimate": -0.715,
+      "tau2": 0.3181
+    }
+  },
+  "hksj": {
+    "estimate": -0.7141,
+    "se": 0.1807,
+    "ci_lb": -1.1078,
+    "ci_ub": -0.3204,
+    "df": 12
+  },
+  "fixed_effect": {
+    "estimate": -0.4303,
+    "se": 0.0405,
+    "ci_lb": -0.5097,
+    "ci_ub": -0.3509
+  },
+  "prediction_interval": {
+    "lb": -1.8582,
+    "ub": 0.4299
+  },
+  "publication_bias": {
+    "egger": {
+      "z": -1.4013,
+      "p": 0.1887
+    },
+    "begg": {
+      "tau": 0.0256,
+      "p": 0.9524
+    },
+    "trimfill": {
+      "k0": 1,
+      "side": "right",
+      "adjusted": -0.6561
+    }
+  },
+  "pet_peese": {
+    "pet_intercept": -0.1909,
+    "peese_intercept": -0.38
+  },
+  "meta_regression": {
+    "intercept": 0.2595,
+    "slope": -0.0292,
+    "R2": 79.4985,
+    "residual_tau2": 0.0633
+  }
+}

@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>PrognosisMeta Validation Suite</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; padding: 20px; background: #f5f5f5; }
+        h1 { color: #2c3e50; }
+        h2 { color: #34495e; border-bottom: 2px solid #3498db; padding-bottom: 5px; }
+        .test-section { background: white; padding: 20px; margin: 15px 0; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .pass { color: #27ae60; font-weight: bold; }
+        .fail { color: #e74c3c; font-weight: bold; }
+        .warn { color: #f39c12; font-weight: bold; }
+        table { width: 100%; border-collapse: collapse; margin: 10px 0; }
+        th, td { padding: 10px; text-align: left; border: 1px solid #ddd; }
+        th { background: #3498db; color: white; }
+        tr:nth-child(even) { background: #f9f9f9; }
+        .summary { font-size: 1.2em; padding: 20px; background: #2c3e50; color: white; border-radius: 8px; margin-top: 20px; }
+        .metric { display: inline-block; margin: 10px 20px; }
+        .metric-value { font-size: 2em; font-weight: bold; }
+        .tolerance { font-size: 0.9em; color: #666; }
+        pre { background: #f4f4f4; padding: 10px; border-radius: 4px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h1>PrognosisMeta Statistical Validation Suite</h1>
+    <p>Comprehensive validation against R packages (metafor v4.8-0, meta v8.2-1)</p>
+
+    <div id="results"></div>
+
+    <script src="../js/statistics.js"></script>
+    <script src="../js/meta-analysis.js"></script>
+    <script>
+    // ================================================================
+    // REFERENCE VALUES FROM R (metafor package)
+    // Dataset: BCG Vaccine Trials (dat.bcg)
+    // ================================================================
+
+    const R_REFERENCE = {
+        // Test data
+        data: [
+            { yi: -0.8893, vi: 0.3256 },
+            { yi: -1.5854, vi: 0.1946 },
+            { yi: -1.3481, vi: 0.4154 },
+            { yi: -1.4416, vi: 0.0200 },
+            { yi: -0.2175, vi: 0.0512 },
+            { yi: -0.7861, vi: 0.0069 },
+            { yi: -1.6209, vi: 0.2230 },
+            { yi: 0.0120, vi: 0.0040 },
+            { yi: -0.4694, vi: 0.0564 },
+            { yi: -1.3713, vi: 0.0730 },
+            { yi: -0.3394, vi: 0.0124 },
+            { yi: 0.4459, vi: 0.5325 },
+            { yi: -0.0173, vi: 0.0714 }
+        ],
+
+        // R results for tau² estimators
+        tau2: {
+            DL: { estimate: -0.714117, tau2: 0.308760 },
+            REML: { estimate: -0.714532, tau2: 0.313243 },
+            PM: { estimate: -0.714970, tau2: 0.318094 },
+            ML: { estimate: -0.711199, tau2: 0.280028 },
+            HS: { estimate: -0.704535, tau2: 0.228363 },
+            SJ: { estimate: -0.717249, tau2: 0.345516 },
+            HE: { estimate: -0.715879, tau2: 0.328564 },
+            EB: { estimate: -0.714968, tau2: 0.318069 }
+        },
+
+        // Heterogeneity
+        heterogeneity: {
+            Q: 152.233,
+            df: 12,
+            I2: 92.12,
+            H2: 12.686
+        },
+
+        // Fixed effect
+        fixed: {
+            estimate: -0.430285,
+            se: 0.040499,
+            ci_lb: -0.509661,
+            ci_ub: -0.350909
+        },
+
+        // HKSJ
+        hksj: {
+            estimate: -0.714117,
+            se: 0.180697,
+            ci_lb: -1.107821,
+            ci_ub: -0.320413,
+            df: 12
+        },
+
+        // Prediction interval
+        prediction: {
+            lb: -1.858154,
+            ub: 0.429919
+        },
+
+        // Publication bias
+        egger: { z: -1.4013, p: 0.188707 },
+        begg: { tau: 0.0256, p: 0.952362 },
+        trimfill: { k0: 1, adjusted: -0.656073 }
+    };
+
+    // Tolerance levels
+    const STRICT_TOL = 1e-4;   // For core calculations
+    const MODERATE_TOL = 0.01; // For iterative methods
+    const LOOSE_TOL = 0.05;    // For numerical optimization
+
+    let totalTests = 0;
+    let passedTests = 0;
+    let warnings = 0;
+
+    function test(name, jsValue, rValue, tolerance = STRICT_TOL) {
+        totalTests++;
+        const diff = Math.abs(jsValue - rValue);
+        const relDiff = rValue !== 0 ? Math.abs(diff / rValue) : diff;
+        const pass = diff < tolerance || relDiff < 0.001;
+
+        if (pass) passedTests++;
+        else if (diff < tolerance * 10) warnings++;
+
+        return {
+            name,
+            js: jsValue,
+            r: rValue,
+            diff,
+            relDiff: relDiff * 100,
+            tolerance,
+            pass,
+            status: pass ? 'pass' : (diff < tolerance * 10 ? 'warn' : 'fail')
+        };
+    }
+
+    function runValidation() {
+        const output = document.getElementById('results');
+        let html = '';
+
+        // Prepare data
+        const data = R_REFERENCE.data;
+        const effects = data.map(d => d.yi);
+        const variances = data.map(d => d.vi);
+        const studies = data.map((d, i) => ({
+            id: i + 1,
+            effectSize: d.yi,
+            variance: d.vi,
+            se: Math.sqrt(d.vi),
+            weight: 1 / d.vi
+        }));
+
+        // ============================================================
+        // TEST 1: Q-Statistic and Basic Heterogeneity
+        // ============================================================
+        html += '<div class="test-section"><h2>1. Q-Statistic & Heterogeneity</h2>';
+        html += '<p class="tolerance">Tolerance: ' + STRICT_TOL + '</p>';
+
+        const qResult = MetaAnalysis.calculateQ ?
+            MetaAnalysis.calculateQ(effects, variances) :
+            { Q: 152.233, df: 12 }; // Fallback if internal function not exposed
+
+        const dlResult = MetaAnalysis.randomEffects(studies, { method: 'DL' });
+
+        const hetTests = [
+            test('Q-statistic', dlResult.Q, R_REFERENCE.heterogeneity.Q),
+            test('I²', dlResult.I2, R_REFERENCE.heterogeneity.I2, MODERATE_TOL)
+        ];
+
+        html += '<table><tr><th>Test</th><th>JavaScript</th><th>R (metafor)</th><th>Diff</th><th>Status</th></tr>';
+        hetTests.forEach(t => {
+            html += `<tr>
+                <td>${t.name}</td>
+                <td>${t.js.toFixed(6)}</td>
+                <td>${t.r.toFixed(6)}</td>
+                <td>${t.diff.toExponential(2)}</td>
+                <td class="${t.status}">${t.status.toUpperCase()}</td>
+            </tr>`;
+        });
+        html += '</table></div>';
+
+        // ============================================================
+        // TEST 2: All Tau² Estimators
+        // ============================================================
+        html += '<div class="test-section"><h2>2. Tau² Estimators</h2>';
+        html += '<p class="tolerance">Tolerance: ' + MODERATE_TOL + ' (iterative methods may vary)</p>';
+
+        const methods = ['DL', 'REML', 'PM', 'ML', 'HS', 'SJ', 'HE', 'EB'];
+        html += '<table><tr><th>Method</th><th>JS Estimate</th><th>R Estimate</th><th>JS τ²</th><th>R τ²</th><th>Est Status</th><th>τ² Status</th></tr>';
+
+        methods.forEach(method => {
+            try {
+                const result = MetaAnalysis.randomEffects(studies, { method });
+                const ref = R_REFERENCE.tau2[method];
+
+                const estTest = test(`${method} estimate`, result.pooledEffect, ref.estimate, MODERATE_TOL);
+                const tau2Test = test(`${method} tau²`, result.tau2, ref.tau2, MODERATE_TOL);
+
+                html += `<tr>
+                    <td><strong>${method}</strong></td>
+                    <td>${result.pooledEffect.toFixed(6)}</td>
+                    <td>${ref.estimate.toFixed(6)}</td>
+                    <td>${result.tau2.toFixed(6)}</td>
+                    <td>${ref.tau2.toFixed(6)}</td>
+                    <td class="${estTest.status}">${estTest.status.toUpperCase()}</td>
+                    <td class="${tau2Test.status}">${tau2Test.status.toUpperCase()}</td>
+                </tr>`;
+            } catch (e) {
+                html += `<tr><td>${method}</td><td colspan="6" class="fail">ERROR: ${e.message}</td></tr>`;
+                totalTests += 2;
+            }
+        });
+        html += '</table></div>';
+
+        // ============================================================
+        // TEST 3: Fixed-Effect Analysis
+        // ============================================================
+        html += '<div class="test-section"><h2>3. Fixed-Effect Meta-Analysis</h2>';
+        html += '<p class="tolerance">Tolerance: ' + STRICT_TOL + '</p>';
+
+        const feResult = MetaAnalysis.fixedEffect(studies);
+        const feTests = [
+            test('Pooled estimate', feResult.pooledEffect, R_REFERENCE.fixed.estimate),
+            test('Standard error', feResult.se, R_REFERENCE.fixed.se),
+            test('CI lower', feResult.ci.lower, R_REFERENCE.fixed.ci_lb),
+            test('CI upper', feResult.ci.upper, R_REFERENCE.fixed.ci_ub)
+        ];
+
+        html += '<table><tr><th>Test</th><th>JavaScript</th><th>R</th><th>Diff</th><th>Status</th></tr>';
+        feTests.forEach(t => {
+            html += `<tr>
+                <td>${t.name}</td>
+                <td>${t.js.toFixed(6)}</td>
+                <td>${t.r.toFixed(6)}</td>
+                <td>${t.diff.toExponential(2)}</td>
+                <td class="${t.status}">${t.status.toUpperCase()}</td>
+            </tr>`;
+        });
+        html += '</table></div>';
+
+        // ============================================================
+        // TEST 4: HKSJ Adjustment
+        // ============================================================
+        html += '<div class="test-section"><h2>4. HKSJ Adjustment</h2>';
+        html += '<p class="tolerance">Tolerance: ' + MODERATE_TOL + '</p>';
+
+        try {
+            const hksjResult = MetaAnalysis.randomEffects(studies, { method: 'DL', hksj: true });
+            const hksjTests = [
+                test('Pooled estimate', hksjResult.pooledEffect, R_REFERENCE.hksj.estimate),
+                test('SE (HKSJ)', hksjResult.se, R_REFERENCE.hksj.se, MODERATE_TOL)
+            ];
+
+            if (hksjResult.ci) {
+                hksjTests.push(test('CI lower', hksjResult.ci.lower, R_REFERENCE.hksj.ci_lb, MODERATE_TOL));
+                hksjTests.push(test('CI upper', hksjResult.ci.upper, R_REFERENCE.hksj.ci_ub, MODERATE_TOL));
+            }
+
+            html += '<table><tr><th>Test</th><th>JavaScript</th><th>R</th><th>Diff</th><th>Status</th></tr>';
+            hksjTests.forEach(t => {
+                html += `<tr>
+                    <td>${t.name}</td>
+                    <td>${t.js.toFixed(6)}</td>
+                    <td>${t.r.toFixed(6)}</td>
+                    <td>${t.diff.toExponential(2)}</td>
+                    <td class="${t.status}">${t.status.toUpperCase()}</td>
+                </tr>`;
+            });
+            html += '</table>';
+        } catch (e) {
+            html += `<p class="fail">HKSJ test failed: ${e.message}</p>`;
+            totalTests += 4;
+        }
+        html += '</div>';
+
+        // ============================================================
+        // TEST 5: Prediction Interval
+        // ============================================================
+        html += '<div class="test-section"><h2>5. Prediction Interval</h2>';
+        html += '<p class="tolerance">Tolerance: ' + MODERATE_TOL + '</p>';
+
+        if (dlResult.predictionInterval) {
+            const piTests = [
+                test('PI lower', dlResult.predictionInterval.lower, R_REFERENCE.prediction.lb, MODERATE_TOL),
+                test('PI upper', dlResult.predictionInterval.upper, R_REFERENCE.prediction.ub, MODERATE_TOL)
+            ];
+
+            html += '<table><tr><th>Test</th><th>JavaScript</th><th>R</th><th>Diff</th><th>Status</th></tr>';
+            piTests.forEach(t => {
+                html += `<tr>
+                    <td>${t.name}</td>
+                    <td>${t.js.toFixed(6)}</td>
+                    <td>${t.r.toFixed(6)}</td>
+                    <td>${t.diff.toExponential(2)}</td>
+                    <td class="${t.status}">${t.status.toUpperCase()}</td>
+                </tr>`;
+            });
+            html += '</table>';
+        } else {
+            html += '<p class="warn">Prediction interval not available in results</p>';
+            totalTests += 2;
+        }
+        html += '</div>';
+
+        // ============================================================
+        // TEST 6: Edge Cases
+        // ============================================================
+        html += '<div class="test-section"><h2>6. Edge Cases</h2>';
+
+        // Single study
+        html += '<h3>6a. Single Study (k=1)</h3>';
+        try {
+            const singleStudy = [{ id: 1, effectSize: -0.5, variance: 0.1, se: Math.sqrt(0.1), weight: 10 }];
+            const singleResult = MetaAnalysis.fixedEffect(singleStudy);
+            html += `<p class="pass">Single study handled: estimate = ${singleResult.pooledEffect.toFixed(4)}</p>`;
+            passedTests++;
+            totalTests++;
+        } catch (e) {
+            html += `<p class="fail">Single study failed: ${e.message}</p>`;
+            totalTests++;
+        }
+
+        // Two studies
+        html += '<h3>6b. Two Studies (k=2)</h3>';
+        try {
+            const twoStudies = [
+                { id: 1, effectSize: -0.5, variance: 0.1, se: Math.sqrt(0.1), weight: 10 },
+                { id: 2, effectSize: -0.3, variance: 0.2, se: Math.sqrt(0.2), weight: 5 }
+            ];
+            const twoResult = MetaAnalysis.randomEffects(twoStudies, { method: 'DL' });
+            html += `<p class="pass">Two studies handled: estimate = ${twoResult.pooledEffect.toFixed(4)}, τ² = ${twoResult.tau2.toFixed(4)}</p>`;
+            passedTests++;
+            totalTests++;
+        } catch (e) {
+            html += `<p class="fail">Two studies failed: ${e.message}</p>`;
+            totalTests++;
+        }
+
+        // Zero heterogeneity
+        html += '<h3>6c. Homogeneous Data (Q < df)</h3>';
+        try {
+            const homogData = [
+                { id: 1, effectSize: -0.5, variance: 0.1, se: Math.sqrt(0.1), weight: 10 },
+                { id: 2, effectSize: -0.5, variance: 0.1, se: Math.sqrt(0.1), weight: 10 },
+                { id: 3, effectSize: -0.5, variance: 0.1, se: Math.sqrt(0.1), weight: 10 }
+            ];
+            const homogResult = MetaAnalysis.randomEffects(homogData, { method: 'DL' });
+            const tau2IsZero = homogResult.tau2 < 0.0001;
+            html += `<p class="${tau2IsZero ? 'pass' : 'warn'}">Homogeneous data: τ² = ${homogResult.tau2.toFixed(6)} (should be ~0)</p>`;
+            if (tau2IsZero) passedTests++;
+            totalTests++;
+        } catch (e) {
+            html += `<p class="fail">Homogeneous data failed: ${e.message}</p>`;
+            totalTests++;
+        }
+
+        // High heterogeneity
+        html += '<h3>6d. Extreme Heterogeneity</h3>';
+        try {
+            const hetData = [
+                { id: 1, effectSize: -2.0, variance: 0.01, se: 0.1, weight: 100 },
+                { id: 2, effectSize: 0.5, variance: 0.01, se: 0.1, weight: 100 },
+                { id: 3, effectSize: 1.0, variance: 0.01, se: 0.1, weight: 100 },
+                { id: 4, effectSize: -1.5, variance: 0.01, se: 0.1, weight: 100 }
+            ];
+            const hetResult = MetaAnalysis.randomEffects(hetData, { method: 'DL' });
+            const highI2 = hetResult.I2 > 95;
+            html += `<p class="${highI2 ? 'pass' : 'warn'}">High heterogeneity handled: I² = ${hetResult.I2.toFixed(2)}% (should be >95%)</p>`;
+            if (highI2) passedTests++;
+            totalTests++;
+        } catch (e) {
+            html += `<p class="fail">High heterogeneity failed: ${e.message}</p>`;
+            totalTests++;
+        }
+
+        html += '</div>';
+
+        // ============================================================
+        // TEST 7: Numerical Precision
+        // ============================================================
+        html += '<div class="test-section"><h2>7. Numerical Precision</h2>';
+
+        html += '<h3>Distribution Functions</h3>';
+        html += '<table><tr><th>Function</th><th>Input</th><th>JS Value</th><th>Expected</th><th>Status</th></tr>';
+
+        // Test normal distribution
+        const normTests = [
+            { fn: 'pnorm', input: 0, expected: 0.5 },
+            { fn: 'pnorm', input: 1.96, expected: 0.975 },
+            { fn: 'pnorm', input: -1.96, expected: 0.025 },
+            { fn: 'qnorm', input: 0.975, expected: 1.96 },
+            { fn: 'qnorm', input: 0.025, expected: -1.96 }
+        ];
+
+        normTests.forEach(t => {
+            const jsVal = Statistics[t.fn](t.input);
+            const diff = Math.abs(jsVal - t.expected);
+            const pass = diff < 0.001;
+            if (pass) passedTests++;
+            totalTests++;
+
+            html += `<tr>
+                <td>${t.fn}</td>
+                <td>${t.input}</td>
+                <td>${jsVal.toFixed(6)}</td>
+                <td>${t.expected.toFixed(6)}</td>
+                <td class="${pass ? 'pass' : 'fail'}">${pass ? 'PASS' : 'FAIL'}</td>
+            </tr>`;
+        });
+
+        // Test chi-squared
+        const chisqTests = [
+            { fn: 'pchisq', args: [3.84, 1], expected: 0.95 },
+            { fn: 'pchisq', args: [5.99, 2], expected: 0.95 },
+            { fn: 'qchisq', args: [0.95, 1], expected: 3.84 }
+        ];
+
+        chisqTests.forEach(t => {
+            const jsVal = Statistics[t.fn](...t.args);
+            const diff = Math.abs(jsVal - t.expected);
+            const pass = diff < 0.05;
+            if (pass) passedTests++;
+            totalTests++;
+
+            html += `<tr>
+                <td>${t.fn}</td>
+                <td>${t.args.join(', ')}</td>
+                <td>${jsVal.toFixed(4)}</td>
+                <td>${t.expected.toFixed(4)}</td>
+                <td class="${pass ? 'pass' : 'warn'}">${pass ? 'PASS' : 'WARN'}</td>
+            </tr>`;
+        });
+
+        html += '</table></div>';
+
+        // ============================================================
+        // SUMMARY
+        // ============================================================
+        const passRate = (passedTests / totalTests * 100).toFixed(1);
+        const statusClass = passRate >= 90 ? 'pass' : passRate >= 70 ? 'warn' : 'fail';
+
+        html += `
+        <div class="summary">
+            <h2>Validation Summary</h2>
+            <div class="metric">
+                <div class="metric-value ${statusClass}">${passedTests}/${totalTests}</div>
+                <div>Tests Passed (${passRate}%)</div>
+            </div>
+            <div class="metric">
+                <div class="metric-value">${warnings}</div>
+                <div>Warnings</div>
+            </div>
+            <div class="metric">
+                <div class="metric-value">${totalTests - passedTests - warnings}</div>
+                <div>Failures</div>
+            </div>
+            <hr style="margin: 20px 0; border-color: #444;">
+            <p><strong>Reference:</strong> metafor v4.8-0, meta v8.2-1 (R 4.5.2)</p>
+            <p><strong>Dataset:</strong> BCG Vaccine Trials (13 studies)</p>
+            <p><strong>Validation Date:</strong> ${new Date().toISOString().split('T')[0]}</p>
+        </div>
+        `;
+
+        output.innerHTML = html;
+    }
+
+    window.onload = runValidation;
+    </script>
+</body>
+</html>

@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>PrognosisMeta Automated Visual Test</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; margin: 20px; background: #f5f5f5; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        h1 { color: #2c3e50; border-bottom: 3px solid #3498db; padding-bottom: 10px; }
+        .test-section { background: white; padding: 20px; margin: 15px 0; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .test-section h2 { color: #34495e; margin-top: 0; }
+        .pass { color: #27ae60; font-weight: bold; }
+        .fail { color: #e74c3c; font-weight: bold; }
+        .result { padding: 8px 12px; margin: 5px 0; border-radius: 4px; }
+        .result.pass { background: #d4edda; border-left: 4px solid #27ae60; }
+        .result.fail { background: #f8d7da; border-left: 4px solid #e74c3c; }
+        .summary { font-size: 1.3em; padding: 20px; background: #3498db; color: white; border-radius: 8px; text-align: center; margin: 20px 0; }
+        .summary.all-pass { background: #27ae60; }
+        .summary.has-fail { background: #e74c3c; }
+        .plot-container { border: 1px solid #ddd; padding: 10px; margin: 10px 0; min-height: 200px; background: #fafafa; }
+        canvas { max-width: 100%; }
+        #results-log { font-family: monospace; font-size: 12px; background: #2c3e50; color: #ecf0f1; padding: 15px; border-radius: 8px; max-height: 400px; overflow-y: auto; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>PrognosisMeta Automated Visual Test Suite</h1>
+        <div id="summary" class="summary">Running tests...</div>
+
+        <div class="test-section">
+            <h2>1. Module Loading Tests</h2>
+            <div id="module-tests"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>2. Statistical Calculation Tests</h2>
+            <div id="stat-tests"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>3. Meta-Analysis Tests</h2>
+            <div id="ma-tests"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>4. Visualization Tests</h2>
+            <div id="viz-tests"></div>
+            <div class="plot-container">
+                <h3>Forest Plot</h3>
+                <canvas id="forest-canvas" width="800" height="400"></canvas>
+            </div>
+            <div class="plot-container">
+                <h3>Funnel Plot</h3>
+                <canvas id="funnel-canvas" width="600" height="400"></canvas>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>5. Advanced Methods Tests</h2>
+            <div id="advanced-tests"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>Test Log</h2>
+            <div id="results-log"></div>
+        </div>
+    </div>
+
+    <!-- Load modules -->
+    <script src="../js/statistics.js"></script>
+    <script src="../js/meta-analysis.js"></script>
+    <script src="../js/bayesian.js"></script>
+    <script src="../js/selection-models.js"></script>
+    <script src="../js/advanced-methods.js"></script>
+    <script src="../js/visualization.js"></script>
+    <script src="../js/export.js"></script>
+
+    <script>
+        // Test results
+        const results = { passed: 0, failed: 0, log: [] };
+
+        function log(msg) {
+            results.log.push(msg);
+            console.log(msg);
+        }
+
+        function addResult(container, name, passed, detail = '') {
+            const div = document.createElement('div');
+            div.className = `result ${passed ? 'pass' : 'fail'}`;
+            div.innerHTML = `<span class="${passed ? 'pass' : 'fail'}">${passed ? '✓' : '✗'}</span> ${name}${detail ? ': ' + detail : ''}`;
+            document.getElementById(container).appendChild(div);
+            if (passed) results.passed++; else results.failed++;
+            log(`${passed ? '[PASS]' : '[FAIL]'} ${name}${detail ? ': ' + detail : ''}`);
+        }
+
+        function runTests() {
+            log('=== Starting PrognosisMeta Visual Test Suite ===\n');
+
+            // 1. Module Loading Tests
+            log('--- Module Loading Tests ---');
+            const modules = [
+                ['Statistics', typeof Statistics !== 'undefined'],
+                ['MetaAnalysis', typeof MetaAnalysis !== 'undefined'],
+                ['BayesianMA', typeof BayesianMA !== 'undefined'],
+                ['SelectionModels', typeof SelectionModels !== 'undefined'],
+                ['AdvancedMethods', typeof AdvancedMethods !== 'undefined'],
+                ['Visualization', typeof Visualization !== 'undefined'],
+                ['ExportModule', typeof ExportModule !== 'undefined']
+            ];
+
+            for (const [name, loaded] of modules) {
+                addResult('module-tests', `${name} module loaded`, loaded);
+            }
+
+            // 2. Statistical Tests
+            log('\n--- Statistical Calculation Tests ---');
+            try {
+                const mean = Statistics.mean([1, 2, 3, 4, 5]);
+                addResult('stat-tests', 'Statistics.mean([1,2,3,4,5])', Math.abs(mean - 3) < 0.001, `= ${mean}`);
+            } catch (e) {
+                addResult('stat-tests', 'Statistics.mean', false, e.message);
+            }
+
+            try {
+                const sd = Statistics.sd([1, 2, 3, 4, 5]);
+                addResult('stat-tests', 'Statistics.sd([1,2,3,4,5])', Math.abs(sd - 1.5811) < 0.01, `= ${sd.toFixed(4)}`);
+            } catch (e) {
+                addResult('stat-tests', 'Statistics.sd', false, e.message);
+            }
+
+            try {
+                const pnorm = Statistics.pnorm(0);
+                addResult('stat-tests', 'Statistics.pnorm(0)', Math.abs(pnorm - 0.5) < 0.001, `= ${pnorm}`);
+            } catch (e) {
+                addResult('stat-tests', 'Statistics.pnorm', false, e.message);
+            }
+
+            try {
+                const qnorm = Statistics.qnorm(0.975);
+                addResult('stat-tests', 'Statistics.qnorm(0.975)', Math.abs(qnorm - 1.96) < 0.01, `= ${qnorm.toFixed(4)}`);
+            } catch (e) {
+                addResult('stat-tests', 'Statistics.qnorm', false, e.message);
+            }
+
+            try {
+                const hedges = Statistics.hedgesG(0.5, 10, 10);
+                addResult('stat-tests', 'Statistics.hedgesG correction', hedges && Math.abs(hedges.g - 0.477) < 0.02, `g = ${hedges?.g?.toFixed(4)}`);
+            } catch (e) {
+                addResult('stat-tests', 'Statistics.hedgesG', false, e.message);
+            }
+
+            // 3. Meta-Analysis Tests
+            log('\n--- Meta-Analysis Tests ---');
+            const effects = [0.5, 0.3, 0.7, 0.4, 0.6, 0.45, 0.55];
+            const variances = [0.04, 0.05, 0.03, 0.06, 0.04, 0.05, 0.04];
+            const ses = variances.map(v => Math.sqrt(v));
+
+            // Test all tau2 estimators
+            const estimators = ['DL', 'REML', 'ML', 'PM', 'HS', 'HE'];
+            for (const est of estimators) {
+                try {
+                    const result = MetaAnalysis.randomEffects(effects, variances, est);
+                    const valid = result && typeof result.effect === 'number' && result.tau2 !== undefined;
+                    addResult('ma-tests', `Random effects (${est})`, valid,
+                        valid ? `effect=${result.effect.toFixed(4)}, tau2=${result.tau2.toFixed(4)}` : 'Invalid result');
+                } catch (e) {
+                    addResult('ma-tests', `Random effects (${est})`, false, e.message);
+                }
+            }
+
+            try {
+                const qResult = MetaAnalysis.calculateQ(effects, variances);
+                addResult('ma-tests', 'Q-statistic', qResult && qResult.Q >= 0, `Q=${qResult?.Q?.toFixed(4)}, p=${qResult?.pValue?.toFixed(4)}`);
+            } catch (e) {
+                addResult('ma-tests', 'Q-statistic', false, e.message);
+            }
+
+            try {
+                const egger = MetaAnalysis.eggerTest(effects, ses);
+                addResult('ma-tests', 'Egger regression test', egger && typeof egger.intercept === 'number',
+                    `intercept=${egger?.intercept?.toFixed(4)}, p=${egger?.pValue?.toFixed(4)}`);
+            } catch (e) {
+                addResult('ma-tests', 'Egger regression test', false, e.message);
+            }
+
+            try {
+                const tf = MetaAnalysis.trimAndFill(effects, variances);
+                addResult('ma-tests', 'Trim-and-fill', tf && typeof tf.k0 === 'number',
+                    `k0=${tf?.k0}, adjusted=${tf?.adjustedEffect?.toFixed(4)}`);
+            } catch (e) {
+                addResult('ma-tests', 'Trim-and-fill', false, e.message);
+            }
+
+            // Bootstrap and GOSH
+            addResult('ma-tests', 'bootstrapCI function exists', typeof MetaAnalysis.bootstrapCI === 'function');
+            addResult('ma-tests', 'goshAnalysis function exists', typeof MetaAnalysis.goshAnalysis === 'function');
+
+            // 4. Visualization Tests
+            log('\n--- Visualization Tests ---');
+
+            // Forest Plot
+            try {
+                const forestCanvas = document.getElementById('forest-canvas');
+                const studies = effects.map((e, i) => ({
+                    name: `Study ${i + 1}`,
+                    effect: e,
+                    se: ses[i],
+                    ci_lower: e - 1.96 * ses[i],
+                    ci_upper: e + 1.96 * ses[i],
+                    weight: 1 / variances[i]
+                }));
+
+                const maResult = MetaAnalysis.randomEffects(effects, variances, 'DL');
+
+                if (Visualization && typeof Visualization.forestPlot === 'function') {
+                    Visualization.forestPlot(forestCanvas, studies, maResult);
+                    addResult('viz-tests', 'Forest plot rendered', true, 'Check canvas above');
+                } else {
+                    addResult('viz-tests', 'Forest plot', false, 'forestPlot function not found');
+                }
+            } catch (e) {
+                addResult('viz-tests', 'Forest plot', false, e.message);
+            }
+
+            // Funnel Plot
+            try {
+                const funnelCanvas = document.getElementById('funnel-canvas');
+                const funnelData = effects.map((e, i) => ({
+                    effect: e,
+                    se: ses[i]
+                }));
+
+                if (Visualization && typeof Visualization.funnelPlot === 'function') {
+                    Visualization.funnelPlot(funnelCanvas, funnelData);
+                    addResult('viz-tests', 'Funnel plot rendered', true, 'Check canvas above');
+                } else {
+                    addResult('viz-tests', 'Funnel plot', false, 'funnelPlot function not found');
+                }
+            } catch (e) {
+                addResult('viz-tests', 'Funnel plot', false, e.message);
+            }
+
+            // 5. Advanced Methods Tests
+            log('\n--- Advanced Methods Tests ---');
+            const advancedFuncs = [
+                'robustVarianceEstimation',
+                'networkMetaAnalysis',
+                'doseResponseMA',
+                'componentNMA',
+                'nodeSplitting',
+                'twoStageIPD',
+                'oneStageIPD',
+                'greenlandLongneckerCovariance',
+                'hamlingReconstruction'
+            ];
+
+            for (const func of advancedFuncs) {
+                const exists = AdvancedMethods && typeof AdvancedMethods[func] === 'function';
+                addResult('advanced-tests', `AdvancedMethods.${func}`, exists);
+            }
+
+            // Selection models
+            const selectionFuncs = ['copasSelectionModel', 'veveaHedgesModel', 'petPeese'];
+            for (const func of selectionFuncs) {
+                const exists = SelectionModels && typeof SelectionModels[func] === 'function';
+                addResult('advanced-tests', `SelectionModels.${func}`, exists);
+            }
+
+            // Bayesian
+            addResult('advanced-tests', 'BayesianMA.bayesianMetaAnalysis',
+                BayesianMA && typeof BayesianMA.bayesianMetaAnalysis === 'function');
+            addResult('advanced-tests', 'BayesianMA.bayesFactorREvsRE',
+                BayesianMA && typeof BayesianMA.bayesFactorREvsRE === 'function');
+
+            // Update summary
+            const summaryEl = document.getElementById('summary');
+            const total = results.passed + results.failed;
+            const pct = (100 * results.passed / total).toFixed(0);
+            summaryEl.textContent = `Tests Complete: ${results.passed}/${total} passed (${pct}%)`;
+            summaryEl.className = 'summary ' + (results.failed === 0 ? 'all-pass' : 'has-fail');
+
+            // Update log display
+            document.getElementById('results-log').textContent = results.log.join('\n');
+
+            log(`\n=== Test Summary: ${results.passed}/${total} passed (${pct}%) ===`);
+        }
+
+        // Run tests after modules load
+        window.onload = function() {
+            setTimeout(runTests, 100);
+        };
+    </script>
+</body>
+</html>

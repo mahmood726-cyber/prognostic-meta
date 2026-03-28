@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dose-Response Meta-Analysis Tutorial | PrognosisMeta</title>
+    <script src="../lib/d3.v7.min.js"></script>
+    <script src="../js/statistics.js"></script>
+    <script src="../js/meta-analysis.js"></script>
+    <script src="../js/advanced-methods.js"></script>
+    <script src="../js/bayesian.js"></script>
+    <script src="../js/visualization.js"></script>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --secondary: #64748b;
+            --success: #16a34a;
+            --warning: #ca8a04;
+            --danger: #dc2626;
+            --bg: #f8fafc;
+            --card: #ffffff;
+            --border: #e2e8f0;
+            --text: #1e293b;
+            --muted: #64748b;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+        }
+        .container { max-width: 1200px; margin: 0 auto; padding: 2rem; }
+        header {
+            background: linear-gradient(135deg, var(--primary) 0%, #1d4ed8 100%);
+            color: white;
+            padding: 3rem 2rem;
+            margin-bottom: 2rem;
+        }
+        header h1 { font-size: 2.5rem; margin-bottom: 0.5rem; }
+        header p { opacity: 0.9; font-size: 1.2rem; }
+        .card {
+            background: var(--card);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            border: 1px solid var(--border);
+        }
+        .card h2 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border);
+        }
+        .card h3 { color: var(--text); margin: 1rem 0 0.5rem; }
+        pre {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 1rem;
+            border-radius: 6px;
+            overflow-x: auto;
+            font-size: 0.9rem;
+            margin: 1rem 0;
+        }
+        code {
+            font-family: 'Fira Code', 'Monaco', monospace;
+        }
+        .inline-code {
+            background: #f1f5f9;
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            font-size: 0.85em;
+        }
+        .plot-container {
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 1rem;
+            background: white;
+            margin: 1rem 0;
+        }
+        .results-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+        .results-table th, .results-table td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+        .results-table th {
+            background: var(--bg);
+            font-weight: 600;
+        }
+        .results-table tr:hover { background: #f8fafc; }
+        .btn {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            font-size: 0.9rem;
+            margin: 0.25rem;
+            transition: all 0.2s;
+        }
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+        .btn-primary:hover { background: #1d4ed8; }
+        .btn-secondary {
+            background: var(--secondary);
+            color: white;
+        }
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+        .example-section { margin: 2rem 0; }
+        .note {
+            background: #fef3c7;
+            border-left: 4px solid var(--warning);
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 0 6px 6px 0;
+        }
+        .tip {
+            background: #dcfce7;
+            border-left: 4px solid var(--success);
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 0 6px 6px 0;
+        }
+        .warning {
+            background: #fee2e2;
+            border-left: 4px solid var(--danger);
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 0 6px 6px 0;
+        }
+        .toc {
+            background: #f1f5f9;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+        }
+        .toc h3 { margin-bottom: 1rem; }
+        .toc ul { list-style: none; }
+        .toc li { margin: 0.5rem 0; }
+        .toc a { color: var(--primary); text-decoration: none; }
+        .toc a:hover { text-decoration: underline; }
+        .model-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+        .model-card {
+            background: var(--bg);
+            padding: 1rem;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+        }
+        .model-card h4 { color: var(--primary); margin-bottom: 0.5rem; }
+        .model-card p { font-size: 0.9rem; color: var(--muted); }
+        #output { font-family: monospace; white-space: pre-wrap; max-height: 300px; overflow-y: auto; }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Dose-Response Meta-Analysis Tutorial</h1>
+            <p>Comprehensive guide to analyzing dose-response relationships with PrognosisMeta</p>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="toc">
+            <h3>Table of Contents</h3>
+            <ul>
+                <li><a href="#introduction">1. Introduction</a></li>
+                <li><a href="#data-format">2. Data Format</a></li>
+                <li><a href="#available-models">3. Available Models</a></li>
+                <li><a href="#basic-analysis">4. Basic Analysis</a></li>
+                <li><a href="#model-comparison">5. Model Comparison</a></li>
+                <li><a href="#advanced-models">6. Advanced Models</a></li>
+                <li><a href="#bayesian-analysis">7. Bayesian Analysis</a></li>
+                <li><a href="#visualization">8. Visualization</a></li>
+                <li><a href="#example-datasets">9. Example Datasets</a></li>
+            </ul>
+        </div>
+
+        <!-- Introduction -->
+        <section id="introduction" class="card">
+            <h2>1. Introduction</h2>
+            <p>Dose-response meta-analysis combines evidence from multiple studies to estimate the relationship
+            between exposure levels (dose) and outcomes. This is particularly valuable when individual studies
+            examine different dose ranges or categories.</p>
+
+            <h3>Key Features</h3>
+            <ul>
+                <li><strong>Multiple model types:</strong> Linear, quadratic, splines, fractional polynomials, and more</li>
+                <li><strong>Covariance handling:</strong> Greenland-Longnecker method for correlated estimates</li>
+                <li><strong>Missing data:</strong> Hamling reconstruction for incomplete reporting</li>
+                <li><strong>Model comparison:</strong> AIC, BIC, and likelihood ratio tests</li>
+                <li><strong>Bayesian inference:</strong> MCMC-based estimation with credible intervals</li>
+                <li><strong>Publication-quality plots:</strong> D3.js visualization with confidence bands</li>
+            </ul>
+        </section>
+
+        <!-- Data Format -->
+        <section id="data-format" class="card">
+            <h2>2. Data Format</h2>
+            <p>Dose-response data should be structured with one row per dose level per study:</p>
+
+            <pre><code>const data = [
+    // Study 1: Coffee and all-cause mortality
+    { study: 'Study A', dose: 0,   yi: 0,     vi: 0,      n: 1000, cases: 50 },
+    { study: 'Study A', dose: 1,   yi: -0.05, vi: 0.01,   n: 1200, cases: 55 },
+    { study: 'Study A', dose: 3,   yi: -0.12, vi: 0.015,  n: 800,  cases: 30 },
+    { study: 'Study A', dose: 5,   yi: -0.08, vi: 0.02,   n: 500,  cases: 22 },
+    // Study 2
+    { study: 'Study B', dose: 0,   yi: 0,     vi: 0,      n: 2000, cases: 100 },
+    { study: 'Study B', dose: 2,   yi: -0.10, vi: 0.008,  n: 1800, cases: 80 },
+    // ... more studies
+];</code></pre>
+
+            <div class="note">
+                <strong>Note:</strong> The reference category (dose=0) should have yi=0 and vi=0.
+                Effect sizes (yi) are typically log relative risks or log odds ratios.
+            </div>
+
+            <h3>Required Fields</h3>
+            <table class="results-table">
+                <tr><th>Field</th><th>Description</th><th>Required</th></tr>
+                <tr><td><code class="inline-code">study</code></td><td>Study identifier</td><td>Yes</td></tr>
+                <tr><td><code class="inline-code">dose</code></td><td>Exposure level</td><td>Yes</td></tr>
+                <tr><td><code class="inline-code">yi</code></td><td>Effect size (log scale)</td><td>Yes</td></tr>
+                <tr><td><code class="inline-code">vi</code></td><td>Variance of effect size</td><td>Yes</td></tr>
+                <tr><td><code class="inline-code">n</code></td><td>Sample size / person-years</td><td>For covariance</td></tr>
+                <tr><td><code class="inline-code">cases</code></td><td>Number of events</td><td>For covariance</td></tr>
+            </table>
+        </section>
+
+        <!-- Available Models -->
+        <section id="available-models" class="card">
+            <h2>3. Available Models</h2>
+
+            <div class="model-grid">
+                <div class="model-card">
+                    <h4>Linear</h4>
+                    <p>y = β × dose</p>
+                    <p>Simplest model, constant effect per unit dose</p>
+                </div>
+                <div class="model-card">
+                    <h4>Quadratic</h4>
+                    <p>y = β₁×dose + β₂×dose²</p>
+                    <p>Captures U-shaped or inverted-U relationships</p>
+                </div>
+                <div class="model-card">
+                    <h4>Log-Linear</h4>
+                    <p>y = β × log(dose + c)</p>
+                    <p>Diminishing returns at higher doses</p>
+                </div>
+                <div class="model-card">
+                    <h4>Restricted Cubic Splines</h4>
+                    <p>Flexible smooth curves with knots</p>
+                    <p>Most flexible for complex relationships</p>
+                </div>
+                <div class="model-card">
+                    <h4>Piecewise Linear</h4>
+                    <p>Linear segments with breakpoints</p>
+                    <p>Threshold effects or changing slopes</p>
+                </div>
+                <div class="model-card">
+                    <h4>Emax</h4>
+                    <p>y = E_max × dose / (ED₅₀ + dose)</p>
+                    <p>Pharmacological dose-response</p>
+                </div>
+                <div class="model-card">
+                    <h4>4-Parameter Sigmoid</h4>
+                    <p>Hill equation with min/max</p>
+                    <p>S-shaped curves with plateau</p>
+                </div>
+                <div class="model-card">
+                    <h4>Fractional Polynomials</h4>
+                    <p>Powers from {-2,-1,-0.5,0,0.5,1,2,3}</p>
+                    <p>Flexible parametric curves</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Basic Analysis -->
+        <section id="basic-analysis" class="card">
+            <h2>4. Basic Analysis</h2>
+
+            <h3>Running a Linear Dose-Response Analysis</h3>
+            <pre><code>// Run linear dose-response meta-analysis
+const result = AdvancedMethods.doseResponseMA(data, 'linear', 'REML');
+
+// Access results
+console.log('Slope:', result.coefficients[0].estimate);
+console.log('95% CI:', result.coefficients[0].ci95);
+console.log('Heterogeneity I²:', result.I2.toFixed(1) + '%');
+console.log('Tau²:', result.tau2.toFixed(4));</code></pre>
+
+            <h3>Interactive Demo</h3>
+            <button class="btn btn-primary" onclick="runLinearDemo()">Run Linear Analysis</button>
+            <div id="linear-output" class="plot-container" style="display:none;">
+                <pre id="linear-results"></pre>
+            </div>
+        </section>
+
+        <!-- Model Comparison -->
+        <section id="model-comparison" class="card">
+            <h2>5. Model Comparison</h2>
+            <p>Compare multiple models to find the best fit using AIC, BIC, and Akaike weights:</p>
+
+            <pre><code>// Compare multiple dose-response models
+const comparison = AdvancedMethods.compareDoseResponseModels(data, 'REML');
+
+// Results include:
+// - AIC and BIC for each model
+// - Akaike weights (probability each model is best)
+// - Best model recommendation
+// - Likelihood ratio tests vs linear model
+
+console.log('Best model:', comparison.bestModel);
+comparison.models.forEach(m => {
+    console.log(`${m.model}: AIC=${m.aic.toFixed(1)}, weight=${(m.weight*100).toFixed(1)}%`);
+});</code></pre>
+
+            <button class="btn btn-primary" onclick="runComparisonDemo()">Compare Models</button>
+            <div id="comparison-output" class="plot-container" style="display:none;">
+                <table class="results-table" id="comparison-table"></table>
+            </div>
+        </section>
+
+        <!-- Advanced Models -->
+        <section id="advanced-models" class="card">
+            <h2>6. Advanced Models</h2>
+
+            <h3>Restricted Cubic Splines</h3>
+            <pre><code>// Spline with 3 knots (default: 10th, 50th, 90th percentiles)
+const splineResult = AdvancedMethods.doseResponseMA(data, 'spline', 'REML', {
+    knots: 3  // or specify exact positions: knots: [1, 3, 5]
+});
+
+// Spline coefficients represent the shape parameters
+splineResult.coefficients.forEach((c, i) => {
+    console.log(`Spline coefficient ${i}: ${c.estimate.toFixed(4)}`);
+});</code></pre>
+
+            <h3>Piecewise Linear (Segmented Regression)</h3>
+            <pre><code>// Auto-detect optimal breakpoint(s) using AIC
+const piecewise = AdvancedMethods.piecewiseLinearDR(data, 'REML');
+
+// Or specify breakpoints manually
+const piecewise2 = AdvancedMethods.piecewiseLinearDR(data, 'REML', [2.5]);
+
+// Results include segment-specific slopes
+console.log('Segments:', piecewise.segments);
+// e.g., "Segment 1 (0-2.5): slope = -0.08"
+//       "Segment 2 (2.5+): slope = -0.02"</code></pre>
+
+            <h3>Fractional Polynomials</h3>
+            <pre><code>// First-degree fractional polynomial (best single power)
+const fp1 = AdvancedMethods.fractionalPolynomialDR(data, 'REML', 1);
+console.log('Best power:', fp1.powers);  // e.g., [0.5] for sqrt(dose)
+
+// Second-degree fractional polynomial (two powers)
+const fp2 = AdvancedMethods.fractionalPolynomialDR(data, 'REML', 2);
+console.log('Best powers:', fp2.powers);  // e.g., [-1, 2]</code></pre>
+
+            <button class="btn btn-primary" onclick="runAdvancedDemo()">Run Advanced Models</button>
+            <div id="advanced-output" class="plot-container" style="display:none;">
+                <pre id="advanced-results"></pre>
+            </div>
+        </section>
+
+        <!-- Bayesian Analysis -->
+        <section id="bayesian-analysis" class="card">
+            <h2>7. Bayesian Analysis</h2>
+            <p>Bayesian dose-response provides posterior distributions, credible intervals, and probability statements:</p>
+
+            <pre><code>// Run Bayesian dose-response meta-analysis
+const bayesResult = BayesianMA.bayesianDoseResponse(data, {
+    model: 'linear',      // 'linear', 'quadratic', or 'spline'
+    iterations: 10000,    // MCMC iterations
+    burnin: 2000,         // Burn-in period
+    chains: 4,            // Number of chains
+    priorBeta: { mu: 0, sigma: 10 },     // Prior on coefficients
+    priorTau: { type: 'halfCauchy', scale: 0.5 }  // Prior on heterogeneity
+});
+
+// Posterior summaries
+bayesResult.coefficients.forEach(c => {
+    console.log(`${c.name}: mean=${c.mean.toFixed(4)}`);
+    console.log(`  95% CrI: [${c.ci95.lower.toFixed(4)}, ${c.ci95.upper.toFixed(4)}]`);
+    console.log(`  P(slope < 0): ${(c.probNegative * 100).toFixed(1)}%`);
+});
+
+// Convergence diagnostics
+console.log('Rhat:', bayesResult.diagnostics.beta[0].rhat);  // Should be < 1.1
+console.log('ESS:', bayesResult.diagnostics.beta[0].ess);    // Should be > 400</code></pre>
+
+            <div class="warning">
+                <strong>Important:</strong> Always check convergence diagnostics. Rhat > 1.1 or ESS < 100
+                indicates the MCMC chains may not have converged. Increase iterations if needed.
+            </div>
+
+            <button class="btn btn-primary" onclick="runBayesianDemo()">Run Bayesian Analysis</button>
+            <button class="btn btn-secondary" onclick="clearBayesian()">Clear</button>
+            <div id="bayesian-output" class="plot-container" style="display:none;">
+                <pre id="bayesian-results"></pre>
+            </div>
+        </section>
+
+        <!-- Visualization -->
+        <section id="visualization" class="card">
+            <h2>8. Visualization</h2>
+
+            <h3>Single Model Plot</h3>
+            <pre><code>// Create dose-response plot with confidence bands
+const container = document.getElementById('plot-container');
+const result = AdvancedMethods.doseResponseMA(data, 'spline', 'REML');
+
+Visualization.doseResponsePlot(container, result, data, {
+    width: 600,
+    height: 400,
+    showCI: true,           // Show confidence bands
+    showStudyPoints: true,  // Show study-level data points
+    xLabel: 'Coffee (cups/day)',
+    yLabel: 'Log Relative Risk',
+    title: 'Coffee and Mortality'
+});</code></pre>
+
+            <h3>Model Comparison Plot</h3>
+            <pre><code>// Overlay multiple model curves for comparison
+const models = {
+    linear: AdvancedMethods.doseResponseMA(data, 'linear', 'REML'),
+    quadratic: AdvancedMethods.doseResponseMA(data, 'quadratic', 'REML'),
+    spline: AdvancedMethods.doseResponseMA(data, 'spline', 'REML')
+};
+
+Visualization.doseResponseComparisonPlot(container, models, data, {
+    showCI: false,  // Hide CI to reduce clutter
+    showAIC: true   // Show AIC values in legend
+});</code></pre>
+
+            <h3>Interactive Plots</h3>
+            <div style="margin: 1rem 0;">
+                <button class="btn btn-primary" onclick="showSinglePlot()">Single Model Plot</button>
+                <button class="btn btn-secondary" onclick="showComparisonPlot()">Comparison Plot</button>
+                <button class="btn btn-success" onclick="showBayesianPlot()">Bayesian Plot</button>
+            </div>
+            <div id="plot-demo" class="plot-container" style="min-height: 450px;"></div>
+        </section>
+
+        <!-- Example Datasets -->
+        <section id="example-datasets" class="card">
+            <h2>9. Example Datasets</h2>
+
+            <h3>Coffee and All-Cause Mortality</h3>
+            <p>Meta-analysis of prospective cohort studies examining coffee consumption and mortality risk.</p>
+            <pre><code id="coffee-data-display"></code></pre>
+
+            <h3>Alcohol and Cardiovascular Disease</h3>
+            <p>J-shaped relationship between alcohol consumption and CVD risk.</p>
+            <pre><code id="alcohol-data-display"></code></pre>
+
+            <h3>Physical Activity and Depression</h3>
+            <p>Dose-response relationship with potential threshold effect.</p>
+            <pre><code id="activity-data-display"></code></pre>
+        </section>
+
+        <!-- References -->
+        <section class="card">
+            <h2>References</h2>
+            <ul>
+                <li>Greenland S, Longnecker MP (1992). Methods for trend estimation from summarized dose-response data. <em>Am J Epidemiol</em> 135:1301-1309.</li>
+                <li>Orsini N, Bellocco R, Greenland S (2006). Generalized least squares for trend estimation of summarized dose-response data. <em>Stata J</em> 6:40-57.</li>
+                <li>Crippa A, Orsini N (2016). Multivariate dose-response meta-analysis. <em>Stat Med</em> 35:2569-2578.</li>
+                <li>Royston P, Altman DG (1994). Regression using fractional polynomials. <em>Appl Stat</em> 43:429-467.</li>
+                <li>Muggeo VMR (2003). Estimating regression models with unknown break-points. <em>Stat Med</em> 22:3055-3071.</li>
+            </ul>
+        </section>
+    </div>
+
+    <script>
+    // Example datasets
+    const coffeeData = [
+        // Freedman 2012
+        { study: 'Freedman 2012', dose: 0, yi: 0, vi: 0, n: 52089, cases: 5034 },
+        { study: 'Freedman 2012', dose: 1, yi: -0.06, vi: 0.0012, n: 78412, cases: 7102 },
+        { study: 'Freedman 2012', dose: 2, yi: -0.10, vi: 0.0010, n: 98765, cases: 8234 },
+        { study: 'Freedman 2012', dose: 4, yi: -0.12, vi: 0.0015, n: 45678, cases: 3567 },
+        { study: 'Freedman 2012', dose: 6, yi: -0.10, vi: 0.0025, n: 23456, cases: 1890 },
+        // Loftfield 2015
+        { study: 'Loftfield 2015', dose: 0, yi: 0, vi: 0, n: 34567, cases: 2345 },
+        { study: 'Loftfield 2015', dose: 1, yi: -0.08, vi: 0.0018, n: 45678, cases: 2890 },
+        { study: 'Loftfield 2015', dose: 3, yi: -0.15, vi: 0.0014, n: 56789, cases: 3123 },
+        { study: 'Loftfield 2015', dose: 5, yi: -0.12, vi: 0.0022, n: 34567, cases: 1987 },
+        // Gunter 2017
+        { study: 'Gunter 2017', dose: 0, yi: 0, vi: 0, n: 67890, cases: 4567 },
+        { study: 'Gunter 2017', dose: 2, yi: -0.09, vi: 0.0011, n: 89012, cases: 5678 },
+        { study: 'Gunter 2017', dose: 4, yi: -0.14, vi: 0.0016, n: 56789, cases: 3456 },
+        // Poole 2017
+        { study: 'Poole 2017', dose: 0, yi: 0, vi: 0, n: 45678, cases: 3234 },
+        { study: 'Poole 2017', dose: 1.5, yi: -0.07, vi: 0.0015, n: 56789, cases: 3890 },
+        { study: 'Poole 2017', dose: 3.5, yi: -0.13, vi: 0.0013, n: 67890, cases: 4123 },
+        { study: 'Poole 2017', dose: 5.5, yi: -0.09, vi: 0.0020, n: 34567, cases: 2345 }
+    ];
+
+    const alcoholData = [
+        // Di Castelnuovo 2006
+        { study: 'Di Castelnuovo 2006', dose: 0, yi: 0, vi: 0, n: 123456, cases: 8765 },
+        { study: 'Di Castelnuovo 2006', dose: 5, yi: -0.15, vi: 0.0020, n: 98765, cases: 5678 },
+        { study: 'Di Castelnuovo 2006', dose: 15, yi: -0.20, vi: 0.0018, n: 87654, cases: 4567 },
+        { study: 'Di Castelnuovo 2006', dose: 30, yi: -0.12, vi: 0.0025, n: 56789, cases: 3456 },
+        { study: 'Di Castelnuovo 2006', dose: 50, yi: 0.08, vi: 0.0035, n: 34567, cases: 2890 },
+        // Ronksley 2011
+        { study: 'Ronksley 2011', dose: 0, yi: 0, vi: 0, n: 89012, cases: 6543 },
+        { study: 'Ronksley 2011', dose: 10, yi: -0.18, vi: 0.0022, n: 78901, cases: 5234 },
+        { study: 'Ronksley 2011', dose: 25, yi: -0.14, vi: 0.0024, n: 56789, cases: 3890 },
+        { study: 'Ronksley 2011', dose: 45, yi: 0.05, vi: 0.0040, n: 34567, cases: 2678 },
+        // Wood 2018
+        { study: 'Wood 2018', dose: 0, yi: 0, vi: 0, n: 234567, cases: 15678 },
+        { study: 'Wood 2018', dose: 5, yi: -0.10, vi: 0.0012, n: 198765, cases: 12345 },
+        { study: 'Wood 2018', dose: 15, yi: -0.08, vi: 0.0010, n: 167890, cases: 10234 },
+        { study: 'Wood 2018', dose: 35, yi: 0.12, vi: 0.0015, n: 98765, cases: 7890 },
+        { study: 'Wood 2018', dose: 60, yi: 0.35, vi: 0.0030, n: 45678, cases: 4567 }
+    ];
+
+    const activityData = [
+        // Schuch 2016
+        { study: 'Schuch 2016', dose: 0, yi: 0, vi: 0, n: 12345, cases: 890 },
+        { study: 'Schuch 2016', dose: 150, yi: -0.25, vi: 0.0030, n: 15678, cases: 567 },
+        { study: 'Schuch 2016', dose: 300, yi: -0.32, vi: 0.0035, n: 13456, cases: 423 },
+        { study: 'Schuch 2016', dose: 600, yi: -0.35, vi: 0.0045, n: 8901, cases: 267 },
+        // Pearce 2022
+        { study: 'Pearce 2022', dose: 0, yi: 0, vi: 0, n: 23456, cases: 1567 },
+        { study: 'Pearce 2022', dose: 75, yi: -0.12, vi: 0.0025, n: 28901, cases: 1890 },
+        { study: 'Pearce 2022', dose: 200, yi: -0.28, vi: 0.0028, n: 25678, cases: 1234 },
+        { study: 'Pearce 2022', dose: 450, yi: -0.30, vi: 0.0038, n: 18901, cases: 890 },
+        // Singh 2023
+        { study: 'Singh 2023', dose: 0, yi: 0, vi: 0, n: 34567, cases: 2345 },
+        { study: 'Singh 2023', dose: 100, yi: -0.18, vi: 0.0022, n: 38901, cases: 2123 },
+        { study: 'Singh 2023', dose: 250, yi: -0.30, vi: 0.0026, n: 32456, cases: 1678 },
+        { study: 'Singh 2023', dose: 500, yi: -0.33, vi: 0.0035, n: 23456, cases: 1123 }
+    ];
+
+    // Display datasets
+    document.getElementById('coffee-data-display').textContent =
+        'const coffeeData = ' + JSON.stringify(coffeeData.slice(0, 6), null, 2) + '\n// ... (16 data points total)';
+    document.getElementById('alcohol-data-display').textContent =
+        'const alcoholData = ' + JSON.stringify(alcoholData.slice(0, 5), null, 2) + '\n// ... (14 data points total)';
+    document.getElementById('activity-data-display').textContent =
+        'const activityData = ' + JSON.stringify(activityData.slice(0, 4), null, 2) + '\n// ... (12 data points total)';
+
+    // Demo functions
+    function runLinearDemo() {
+        const result = AdvancedMethods.doseResponseMA(coffeeData, 'linear', 'REML');
+        const output = `Linear Dose-Response Analysis
+=============================
+Slope: ${result.coefficients[0].estimate.toFixed(4)} per cup/day
+SE: ${result.coefficients[0].se.toFixed(4)}
+95% CI: [${result.coefficients[0].ci95.lower.toFixed(4)}, ${result.coefficients[0].ci95.upper.toFixed(4)}]
+p-value: ${result.coefficients[0].pvalue.toFixed(4)}
+
+Heterogeneity:
+I²: ${result.I2.toFixed(1)}%
+τ²: ${result.tau2.toFixed(4)}
+Q: ${result.Q.toFixed(2)} (df=${result.Qdf}, p=${result.Qpvalue.toFixed(4)})
+
+Interpretation: Each additional cup of coffee per day is associated with
+a ${(Math.exp(result.coefficients[0].estimate) - 1) * 100 > 0 ? 'increase' : 'decrease'} of ${Math.abs((Math.exp(result.coefficients[0].estimate) - 1) * 100).toFixed(1)}% in the risk.`;
+
+        document.getElementById('linear-output').style.display = 'block';
+        document.getElementById('linear-results').textContent = output;
+    }
+
+    function runComparisonDemo() {
+        const comparison = AdvancedMethods.compareDoseResponseModels(coffeeData, 'REML');
+
+        let html = '<tr><th>Model</th><th>AIC</th><th>BIC</th><th>Weight</th><th>LRT p-value</th></tr>';
+        comparison.models.forEach(m => {
+            const isBest = m.model === comparison.bestModel;
+            html += `<tr style="${isBest ? 'background:#dcfce7;' : ''}">
+                <td>${m.model}${isBest ? ' ✓' : ''}</td>
+                <td>${m.aic.toFixed(2)}</td>
+                <td>${m.bic.toFixed(2)}</td>
+                <td>${(m.weight * 100).toFixed(1)}%</td>
+                <td>${m.lrtPvalue ? m.lrtPvalue.toFixed(4) : '-'}</td>
+            </tr>`;
+        });
+
+        document.getElementById('comparison-output').style.display = 'block';
+        document.getElementById('comparison-table').innerHTML = html;
+    }
+
+    function runAdvancedDemo() {
+        let output = 'Advanced Model Results\n======================\n\n';
+
+        // Log-linear
+        const loglin = AdvancedMethods.logLinearDoseResponse(coffeeData, 'REML');
+        output += `Log-Linear Model:\n`;
+        output += `  Slope: ${loglin.coefficients[0].estimate.toFixed(4)}\n`;
+        output += `  Model: y = ${loglin.coefficients[0].estimate.toFixed(4)} × log(dose + 1)\n\n`;
+
+        // Piecewise
+        const piece = AdvancedMethods.piecewiseLinearDR(coffeeData, 'REML');
+        output += `Piecewise Linear Model:\n`;
+        output += `  Knots: ${piece.knots.map(k => k.toFixed(1)).join(', ')}\n`;
+        if (piece.segments) {
+            piece.segments.forEach(s => {
+                output += `  ${s}\n`;
+            });
+        }
+        output += `  AIC: ${piece.aic ? piece.aic.toFixed(2) : 'N/A'}\n\n`;
+
+        // Fractional polynomial
+        const fp = AdvancedMethods.fractionalPolynomialDR(coffeeData, 'REML', 1);
+        output += `Fractional Polynomial (degree 1):\n`;
+        output += `  Best power: ${fp.powers.join(', ')}\n`;
+        output += `  Coefficient: ${fp.coefficients[0].estimate.toFixed(4)}\n`;
+        output += `  AIC: ${fp.aic ? fp.aic.toFixed(2) : 'N/A'}\n`;
+
+        document.getElementById('advanced-output').style.display = 'block';
+        document.getElementById('advanced-results').textContent = output;
+    }
+
+    function runBayesianDemo() {
+        document.getElementById('bayesian-output').style.display = 'block';
+        document.getElementById('bayesian-results').textContent = 'Running MCMC... (this may take a few seconds)';
+
+        setTimeout(() => {
+            try {
+                const result = BayesianMA.bayesianDoseResponse(coffeeData, {
+                    model: 'linear',
+                    iterations: 5000,
+                    burnin: 1000,
+                    chains: 2
+                });
+
+                let output = `Bayesian Dose-Response Analysis
+================================
+
+Posterior Summaries:
+`;
+                result.coefficients.forEach(c => {
+                    output += `\n${c.name}:
+  Mean: ${c.mean.toFixed(4)}
+  Median: ${c.median.toFixed(4)}
+  SD: ${c.sd.toFixed(4)}
+  95% CrI: [${c.ci95.lower.toFixed(4)}, ${c.ci95.upper.toFixed(4)}]
+  P(slope < 0): ${(c.probNegative * 100).toFixed(1)}%
+`;
+                });
+
+                output += `\nHeterogeneity (τ):
+  Mean: ${result.tau.mean.toFixed(4)}
+  95% CrI: [${result.tau.ci95.lower.toFixed(4)}, ${result.tau.ci95.upper.toFixed(4)}]
+
+Convergence Diagnostics:
+  Rhat: ${result.diagnostics.beta[0].rhat.toFixed(3)} ${result.diagnostics.beta[0].rhat < 1.1 ? '✓' : '⚠️'}
+  ESS: ${Math.round(result.diagnostics.beta[0].ess)} ${result.diagnostics.beta[0].ess > 400 ? '✓' : '⚠️'}
+`;
+
+                document.getElementById('bayesian-results').textContent = output;
+            } catch (e) {
+                document.getElementById('bayesian-results').textContent = 'Error: ' + e.message;
+            }
+        }, 100);
+    }
+
+    function clearBayesian() {
+        document.getElementById('bayesian-output').style.display = 'none';
+    }
+
+    function showSinglePlot() {
+        const container = document.getElementById('plot-demo');
+        container.innerHTML = '';
+
+        const result = AdvancedMethods.doseResponseMA(coffeeData, 'spline', 'REML', { knots: 3 });
+        Visualization.doseResponsePlot(container, result, coffeeData, {
+            width: 700,
+            height: 400,
+            showCI: true,
+            showStudyPoints: true,
+            xLabel: 'Coffee Consumption (cups/day)',
+            yLabel: 'Log Relative Risk',
+            title: 'Coffee and All-Cause Mortality (Spline Model)'
+        });
+    }
+
+    function showComparisonPlot() {
+        const container = document.getElementById('plot-demo');
+        container.innerHTML = '';
+
+        const models = {
+            linear: AdvancedMethods.doseResponseMA(coffeeData, 'linear', 'REML'),
+            quadratic: AdvancedMethods.doseResponseMA(coffeeData, 'quadratic', 'REML'),
+            spline: AdvancedMethods.doseResponseMA(coffeeData, 'spline', 'REML', { knots: 3 })
+        };
+
+        Visualization.doseResponseComparisonPlot(container, models, coffeeData, {
+            width: 700,
+            height: 400,
+            showCI: false,
+            showStudyPoints: true,
+            showAIC: true,
+            xLabel: 'Coffee Consumption (cups/day)',
+            yLabel: 'Log Relative Risk',
+            title: 'Model Comparison: Coffee and Mortality'
+        });
+    }
+
+    function showBayesianPlot() {
+        const container = document.getElementById('plot-demo');
+        container.innerHTML = '<p>Running Bayesian analysis... (please wait)</p>';
+
+        setTimeout(() => {
+            try {
+                const result = BayesianMA.bayesianDoseResponse(coffeeData, {
+                    model: 'linear',
+                    iterations: 3000,
+                    burnin: 500,
+                    chains: 2
+                });
+
+                container.innerHTML = '';
+                Visualization.doseResponsePlot(container, result, coffeeData, {
+                    width: 700,
+                    height: 400,
+                    showCI: true,
+                    showStudyPoints: true,
+                    xLabel: 'Coffee Consumption (cups/day)',
+                    yLabel: 'Log Relative Risk',
+                    title: 'Bayesian Dose-Response (95% Credible Interval)'
+                });
+            } catch (e) {
+                container.innerHTML = '<p style="color:red;">Error: ' + e.message + '</p>';
+            }
+        }, 100);
+    }
+    </script>
+</body>
+</html>

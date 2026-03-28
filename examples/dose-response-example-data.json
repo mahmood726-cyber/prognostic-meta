@@ -1,0 +1,114 @@
+{
+  "datasets": {
+    "coffee_mortality": {
+      "name": "Coffee and All-Cause Mortality",
+      "description": "Meta-analysis of prospective cohort studies examining coffee consumption and all-cause mortality",
+      "doseUnit": "cups/day",
+      "outcomeType": "mortality",
+      "effectMeasure": "log relative risk",
+      "source": "Simulated based on published meta-analyses",
+      "data": [
+        { "study": "Freedman 2012", "dose": 0, "yi": 0, "vi": 0, "n": 52089, "cases": 5034 },
+        { "study": "Freedman 2012", "dose": 1, "yi": -0.06, "vi": 0.0012, "n": 78412, "cases": 7102 },
+        { "study": "Freedman 2012", "dose": 2, "yi": -0.10, "vi": 0.0010, "n": 98765, "cases": 8234 },
+        { "study": "Freedman 2012", "dose": 4, "yi": -0.12, "vi": 0.0015, "n": 45678, "cases": 3567 },
+        { "study": "Freedman 2012", "dose": 6, "yi": -0.10, "vi": 0.0025, "n": 23456, "cases": 1890 },
+        { "study": "Loftfield 2015", "dose": 0, "yi": 0, "vi": 0, "n": 34567, "cases": 2345 },
+        { "study": "Loftfield 2015", "dose": 1, "yi": -0.08, "vi": 0.0018, "n": 45678, "cases": 2890 },
+        { "study": "Loftfield 2015", "dose": 3, "yi": -0.15, "vi": 0.0014, "n": 56789, "cases": 3123 },
+        { "study": "Loftfield 2015", "dose": 5, "yi": -0.12, "vi": 0.0022, "n": 34567, "cases": 1987 },
+        { "study": "Gunter 2017", "dose": 0, "yi": 0, "vi": 0, "n": 67890, "cases": 4567 },
+        { "study": "Gunter 2017", "dose": 2, "yi": -0.09, "vi": 0.0011, "n": 89012, "cases": 5678 },
+        { "study": "Gunter 2017", "dose": 4, "yi": -0.14, "vi": 0.0016, "n": 56789, "cases": 3456 },
+        { "study": "Poole 2017", "dose": 0, "yi": 0, "vi": 0, "n": 45678, "cases": 3234 },
+        { "study": "Poole 2017", "dose": 1.5, "yi": -0.07, "vi": 0.0015, "n": 56789, "cases": 3890 },
+        { "study": "Poole 2017", "dose": 3.5, "yi": -0.13, "vi": 0.0013, "n": 67890, "cases": 4123 },
+        { "study": "Poole 2017", "dose": 5.5, "yi": -0.09, "vi": 0.0020, "n": 34567, "cases": 2345 }
+      ]
+    },
+    "alcohol_cvd": {
+      "name": "Alcohol and Cardiovascular Disease",
+      "description": "J-shaped relationship between alcohol consumption and CVD risk",
+      "doseUnit": "g/day ethanol",
+      "outcomeType": "cardiovascular disease",
+      "effectMeasure": "log relative risk",
+      "source": "Simulated based on published meta-analyses",
+      "data": [
+        { "study": "Di Castelnuovo 2006", "dose": 0, "yi": 0, "vi": 0, "n": 123456, "cases": 8765 },
+        { "study": "Di Castelnuovo 2006", "dose": 5, "yi": -0.15, "vi": 0.0020, "n": 98765, "cases": 5678 },
+        { "study": "Di Castelnuovo 2006", "dose": 15, "yi": -0.20, "vi": 0.0018, "n": 87654, "cases": 4567 },
+        { "study": "Di Castelnuovo 2006", "dose": 30, "yi": -0.12, "vi": 0.0025, "n": 56789, "cases": 3456 },
+        { "study": "Di Castelnuovo 2006", "dose": 50, "yi": 0.08, "vi": 0.0035, "n": 34567, "cases": 2890 },
+        { "study": "Ronksley 2011", "dose": 0, "yi": 0, "vi": 0, "n": 89012, "cases": 6543 },
+        { "study": "Ronksley 2011", "dose": 10, "yi": -0.18, "vi": 0.0022, "n": 78901, "cases": 5234 },
+        { "study": "Ronksley 2011", "dose": 25, "yi": -0.14, "vi": 0.0024, "n": 56789, "cases": 3890 },
+        { "study": "Ronksley 2011", "dose": 45, "yi": 0.05, "vi": 0.0040, "n": 34567, "cases": 2678 },
+        { "study": "Wood 2018", "dose": 0, "yi": 0, "vi": 0, "n": 234567, "cases": 15678 },
+        { "study": "Wood 2018", "dose": 5, "yi": -0.10, "vi": 0.0012, "n": 198765, "cases": 12345 },
+        { "study": "Wood 2018", "dose": 15, "yi": -0.08, "vi": 0.0010, "n": 167890, "cases": 10234 },
+        { "study": "Wood 2018", "dose": 35, "yi": 0.12, "vi": 0.0015, "n": 98765, "cases": 7890 },
+        { "study": "Wood 2018", "dose": 60, "yi": 0.35, "vi": 0.0030, "n": 45678, "cases": 4567 }
+      ]
+    },
+    "physical_activity_depression": {
+      "name": "Physical Activity and Depression",
+      "description": "Dose-response relationship between physical activity and depression risk with threshold effect",
+      "doseUnit": "minutes/week of moderate activity",
+      "outcomeType": "depression",
+      "effectMeasure": "log relative risk",
+      "source": "Simulated based on published meta-analyses",
+      "data": [
+        { "study": "Schuch 2016", "dose": 0, "yi": 0, "vi": 0, "n": 12345, "cases": 890 },
+        { "study": "Schuch 2016", "dose": 150, "yi": -0.25, "vi": 0.0030, "n": 15678, "cases": 567 },
+        { "study": "Schuch 2016", "dose": 300, "yi": -0.32, "vi": 0.0035, "n": 13456, "cases": 423 },
+        { "study": "Schuch 2016", "dose": 600, "yi": -0.35, "vi": 0.0045, "n": 8901, "cases": 267 },
+        { "study": "Pearce 2022", "dose": 0, "yi": 0, "vi": 0, "n": 23456, "cases": 1567 },
+        { "study": "Pearce 2022", "dose": 75, "yi": -0.12, "vi": 0.0025, "n": 28901, "cases": 1890 },
+        { "study": "Pearce 2022", "dose": 200, "yi": -0.28, "vi": 0.0028, "n": 25678, "cases": 1234 },
+        { "study": "Pearce 2022", "dose": 450, "yi": -0.30, "vi": 0.0038, "n": 18901, "cases": 890 },
+        { "study": "Singh 2023", "dose": 0, "yi": 0, "vi": 0, "n": 34567, "cases": 2345 },
+        { "study": "Singh 2023", "dose": 100, "yi": -0.18, "vi": 0.0022, "n": 38901, "cases": 2123 },
+        { "study": "Singh 2023", "dose": 250, "yi": -0.30, "vi": 0.0026, "n": 32456, "cases": 1678 },
+        { "study": "Singh 2023", "dose": 500, "yi": -0.33, "vi": 0.0035, "n": 23456, "cases": 1123 }
+      ]
+    },
+    "bmi_diabetes": {
+      "name": "BMI and Type 2 Diabetes",
+      "description": "Exponential-like dose-response between BMI and diabetes risk",
+      "doseUnit": "kg/m^2",
+      "outcomeType": "type 2 diabetes",
+      "effectMeasure": "log relative risk",
+      "source": "Simulated based on published meta-analyses",
+      "data": [
+        { "study": "Aune 2015", "dose": 22, "yi": 0, "vi": 0, "n": 45678, "cases": 890 },
+        { "study": "Aune 2015", "dose": 25, "yi": 0.35, "vi": 0.0015, "n": 56789, "cases": 1567 },
+        { "study": "Aune 2015", "dose": 28, "yi": 0.75, "vi": 0.0018, "n": 43210, "cases": 2345 },
+        { "study": "Aune 2015", "dose": 32, "yi": 1.20, "vi": 0.0025, "n": 32109, "cases": 3456 },
+        { "study": "Aune 2015", "dose": 36, "yi": 1.55, "vi": 0.0035, "n": 21098, "cases": 3890 },
+        { "study": "Kodama 2014", "dose": 22, "yi": 0, "vi": 0, "n": 34567, "cases": 678 },
+        { "study": "Kodama 2014", "dose": 24, "yi": 0.22, "vi": 0.0012, "n": 45678, "cases": 1234 },
+        { "study": "Kodama 2014", "dose": 27, "yi": 0.58, "vi": 0.0016, "n": 38901, "cases": 1890 },
+        { "study": "Kodama 2014", "dose": 30, "yi": 0.95, "vi": 0.0022, "n": 28765, "cases": 2345 },
+        { "study": "Kodama 2014", "dose": 35, "yi": 1.45, "vi": 0.0032, "n": 18901, "cases": 2890 }
+      ]
+    }
+  },
+  "metadata": {
+    "version": "1.0",
+    "created": "2024-12",
+    "description": "Example datasets for dose-response meta-analysis tutorial",
+    "dataFormat": {
+      "study": "Study identifier",
+      "dose": "Exposure level in the specified unit",
+      "yi": "Effect size (log relative risk)",
+      "vi": "Variance of the effect size",
+      "n": "Sample size or person-years",
+      "cases": "Number of events/cases"
+    },
+    "notes": [
+      "Reference category (lowest dose) has yi=0 and vi=0",
+      "Effect sizes are on the log scale",
+      "These are simulated data based on published meta-analyses for educational purposes"
+    ]
+  }
+}

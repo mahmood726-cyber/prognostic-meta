@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>PrognosisMeta vs R Benchmark</title>
+    <style>
+        body { font-family: 'Consolas', monospace; padding: 20px; background: #1a1a2e; color: #eee; }
+        h1 { color: #00d4ff; }
+        h2 { color: #ffd700; border-bottom: 1px solid #444; padding-bottom: 5px; }
+        .pass { color: #00ff88; }
+        .fail { color: #ff4444; }
+        .warn { color: #ffaa00; }
+        table { border-collapse: collapse; margin: 10px 0; }
+        th, td { padding: 8px 15px; text-align: left; border: 1px solid #444; }
+        th { background: #2a2a4e; }
+        .diff { font-size: 0.9em; color: #888; }
+        #results { white-space: pre-wrap; }
+        .summary { background: #2a2a4e; padding: 15px; border-radius: 8px; margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <h1>PrognosisMeta vs R Benchmark</h1>
+    <p>Comparing JavaScript calculations against metafor/meta R packages</p>
+
+    <div id="results"></div>
+
+    <script src="../js/statistics.js"></script>
+    <script src="../js/meta-analysis.js"></script>
+    <script>
+    // R benchmark results (from benchmark_results.json)
+    const R_RESULTS = {
+        dataset: "BCG Vaccine Trials",
+        n_studies: 13,
+
+        random_effects: {
+            DL: { estimate: -0.714117, se: 0.178742, tau2: 0.308760, I2: 92.12, Q: 152.2330 },
+            REML: { estimate: -0.714532, tau2: 0.313243 },
+            PM: { estimate: -0.714970, tau2: 0.318094 },
+            ML: { estimate: -0.711199, tau2: 0.280028 },
+            HS: { estimate: -0.704535, tau2: 0.228363 },
+            SJ: { estimate: -0.717249, tau2: 0.345516 },
+            HE: { estimate: -0.715879, tau2: 0.328564 },
+            EB: { estimate: -0.714968, tau2: 0.318069 }
+        },
+
+        hksj: { estimate: -0.714117, se: 0.180697, ci_lb: -1.107821, ci_ub: -0.320413, df: 12 },
+        fixed_effect: { estimate: -0.430285, se: 0.040499, ci_lb: -0.509661, ci_ub: -0.350909 },
+        prediction_interval: { lb: -1.858154, ub: 0.429919 },
+
+        publication_bias: {
+            egger: { z: -1.4013, p: 0.188707 },
+            begg: { tau: 0.0256, p: 0.952362 },
+            trimfill: { k0: 1, adjusted: -0.656073 }
+        }
+    };
+
+    // BCG vaccine trial data (from metafor dat.bcg)
+    const BCG_DATA = [
+        { study: "Aronson", yi: -0.8893, vi: 0.3255 },
+        { study: "Ferguson & Simes", yi: -1.5854, vi: 0.1942 },
+        { study: "Rosenthal et al", yi: -1.3481, vi: 0.4154 },
+        { study: "Hart & Sutherland", yi: -1.4416, vi: 0.0200 },
+        { study: "Frimodt-Moller et al", yi: -0.2175, vi: 0.0512 },
+        { study: "Stein & Aronson", yi: -0.7861, vi: 0.0567 },
+        { study: "Vandiviere et al", yi: 0.0120, vi: 0.4632 },
+        { study: "TPT Madras", yi: 0.5710, vi: 0.0731 },
+        { study: "Coetzee & Berjak", yi: -1.1394, vi: 0.1671 },
+        { study: "Rosenthal et al", yi: -0.4724, vi: 0.0178 },
+        { study: "Comstock et al", yi: -0.0173, vi: 0.0144 },
+        { study: "Comstock & Webster", yi: -1.4564, vi: 0.3405 },
+        { study: "Comstock et al", yi: -0.3357, vi: 0.0287 }
+    ];
+
+    const TOLERANCE = 0.0001; // Acceptable difference for numerical comparison
+
+    function compareValues(jsVal, rVal, label, tolerance = TOLERANCE) {
+        const diff = Math.abs(jsVal - rVal);
+        const relDiff = rVal !== 0 ? Math.abs(diff / rVal) * 100 : diff * 100;
+        const pass = diff < tolerance || relDiff < 0.1; // Within tolerance or 0.1% relative
+
+        return {
+            label,
+            js: jsVal,
+            r: rVal,
+            diff,
+            relDiff,
+            pass
+        };
+    }
+
+    function formatResult(result) {
+        const status = result.pass ? '<span class="pass">✓ PASS</span>' : '<span class="fail">✗ FAIL</span>';
+        const diffStr = `<span class="diff">(diff: ${result.diff.toExponential(2)}, ${result.relDiff.toFixed(4)}%)</span>`;
+        return `${status} ${result.label}: JS=${result.js.toFixed(6)}, R=${result.r.toFixed(6)} ${diffStr}`;
+    }
+
+    async function runBenchmark() {
+        const output = document.getElementById('results');
+        let html = '';
+        let passCount = 0;
+        let totalCount = 0;
+        const comparisons = [];
+
+        // Prepare data
+        const studies = BCG_DATA.map((d, i) => ({
+            id: i + 1,
+            name: d.study,
+            effectSize: d.yi,
+            variance: d.vi,
+            se: Math.sqrt(d.vi),
+            weight: 1 / d.vi
+        }));
+
+        html += '<h2>1. Random-Effects Meta-Analysis (DL)</h2>';
+
+        // Run DerSimonian-Laird
+        const dlResult = MetaAnalysis.randomEffects(studies, { method: 'DL' });
+
+        comparisons.push(compareValues(dlResult.pooledEffect, R_RESULTS.random_effects.DL.estimate, 'Pooled Estimate'));
+        comparisons.push(compareValues(dlResult.se, R_RESULTS.random_effects.DL.se, 'Standard Error'));
+        comparisons.push(compareValues(dlResult.tau2, R_RESULTS.random_effects.DL.tau2, 'Tau²'));
+        comparisons.push(compareValues(dlResult.I2, R_RESULTS.random_effects.DL.I2, 'I²'));
+        comparisons.push(compareValues(dlResult.Q, R_RESULTS.random_effects.DL.Q, 'Q statistic'));
+
+        html += '<table><tr><th>Metric</th><th>JavaScript</th><th>R (metafor)</th><th>Diff</th><th>Status</th></tr>';
+        comparisons.forEach(c => {
+            totalCount++;
+            if (c.pass) passCount++;
+            const status = c.pass ? '<span class="pass">✓</span>' : '<span class="fail">✗</span>';
+            html += `<tr>
+                <td>${c.label}</td>
+                <td>${c.js.toFixed(6)}</td>
+                <td>${c.r.toFixed(6)}</td>
+                <td>${c.diff.toExponential(2)}</td>
+                <td>${status}</td>
+            </tr>`;
+        });
+        html += '</table>';
+
+        // Test other tau² estimators
+        html += '<h2>2. Other Tau² Estimators</h2>';
+        html += '<table><tr><th>Method</th><th>JS Estimate</th><th>R Estimate</th><th>JS Tau²</th><th>R Tau²</th><th>Status</th></tr>';
+
+        const methods = ['REML', 'PM', 'ML', 'HS', 'SJ', 'HE', 'EB'];
+        for (const method of methods) {
+            try {
+                const result = MetaAnalysis.randomEffects(studies, { method });
+                const rData = R_RESULTS.random_effects[method];
+
+                const estMatch = Math.abs(result.pooledEffect - rData.estimate) < 0.01;
+                const tau2Match = Math.abs(result.tau2 - rData.tau2) < 0.01;
+                const pass = estMatch && tau2Match;
+
+                totalCount += 2;
+                if (estMatch) passCount++;
+                if (tau2Match) passCount++;
+
+                const status = pass ? '<span class="pass">✓</span>' : '<span class="warn">~</span>';
+                html += `<tr>
+                    <td>${method}</td>
+                    <td>${result.pooledEffect.toFixed(6)}</td>
+                    <td>${rData.estimate.toFixed(6)}</td>
+                    <td>${result.tau2.toFixed(6)}</td>
+                    <td>${rData.tau2.toFixed(6)}</td>
+                    <td>${status}</td>
+                </tr>`;
+            } catch (e) {
+                html += `<tr><td>${method}</td><td colspan="5" class="warn">Not implemented: ${e.message}</td></tr>`;
+            }
+        }
+        html += '</table>';
+
+        // Fixed Effect
+        html += '<h2>3. Fixed-Effect Meta-Analysis</h2>';
+        const feResult = MetaAnalysis.fixedEffect(studies);
+
+        const feComparisons = [
+            compareValues(feResult.pooledEffect, R_RESULTS.fixed_effect.estimate, 'Pooled Estimate'),
+            compareValues(feResult.se, R_RESULTS.fixed_effect.se, 'Standard Error'),
+            compareValues(feResult.ci.lower, R_RESULTS.fixed_effect.ci_lb, 'CI Lower'),
+            compareValues(feResult.ci.upper, R_RESULTS.fixed_effect.ci_ub, 'CI Upper')
+        ];
+
+        html += '<table><tr><th>Metric</th><th>JavaScript</th><th>R</th><th>Status</th></tr>';
+        feComparisons.forEach(c => {
+            totalCount++;
+            if (c.pass) passCount++;
+            const status = c.pass ? '<span class="pass">✓</span>' : '<span class="fail">✗</span>';
+            html += `<tr><td>${c.label}</td><td>${c.js.toFixed(6)}</td><td>${c.r.toFixed(6)}</td><td>${status}</td></tr>`;
+        });
+        html += '</table>';
+
+        // HKSJ Adjustment
+        html += '<h2>4. HKSJ Adjustment</h2>';
+        const hksjResult = MetaAnalysis.randomEffects(studies, { method: 'DL', hksj: true });
+
+        html += '<table><tr><th>Metric</th><th>JavaScript</th><th>R</th><th>Status</th></tr>';
+
+        const hksjComparisons = [
+            compareValues(hksjResult.pooledEffect, R_RESULTS.hksj.estimate, 'Pooled Estimate'),
+            compareValues(hksjResult.se, R_RESULTS.hksj.se, 'SE (HKSJ-adjusted)', 0.001)
+        ];
+
+        if (hksjResult.ci) {
+            hksjComparisons.push(compareValues(hksjResult.ci.lower, R_RESULTS.hksj.ci_lb, 'CI Lower', 0.01));
+            hksjComparisons.push(compareValues(hksjResult.ci.upper, R_RESULTS.hksj.ci_ub, 'CI Upper', 0.01));
+        }
+
+        hksjComparisons.forEach(c => {
+            totalCount++;
+            if (c.pass) passCount++;
+            const status = c.pass ? '<span class="pass">✓</span>' : '<span class="fail">✗</span>';
+            html += `<tr><td>${c.label}</td><td>${c.js.toFixed(6)}</td><td>${c.r.toFixed(6)}</td><td>${status}</td></tr>`;
+        });
+        html += '</table>';
+
+        // Prediction Interval
+        html += '<h2>5. Prediction Interval</h2>';
+        if (dlResult.predictionInterval) {
+            const piComparisons = [
+                compareValues(dlResult.predictionInterval.lower, R_RESULTS.prediction_interval.lb, 'PI Lower', 0.01),
+                compareValues(dlResult.predictionInterval.upper, R_RESULTS.prediction_interval.ub, 'PI Upper', 0.01)
+            ];
+
+            html += '<table><tr><th>Metric</th><th>JavaScript</th><th>R</th><th>Status</th></tr>';
+            piComparisons.forEach(c => {
+                totalCount++;
+                if (c.pass) passCount++;
+                const status = c.pass ? '<span class="pass">✓</span>' : '<span class="fail">✗</span>';
+                html += `<tr><td>${c.label}</td><td>${c.js.toFixed(6)}</td><td>${c.r.toFixed(6)}</td><td>${status}</td></tr>`;
+            });
+            html += '</table>';
+        } else {
+            html += '<p class="warn">Prediction interval not available in results</p>';
+        }
+
+        // Publication Bias Tests
+        html += '<h2>6. Publication Bias Tests</h2>';
+
+        try {
+            const eggerTest = MetaAnalysis.eggerTest(studies);
+            const beggTest = MetaAnalysis.beggTest(studies);
+
+            html += '<table><tr><th>Test</th><th>Metric</th><th>JavaScript</th><th>R</th><th>Status</th></tr>';
+
+            if (eggerTest) {
+                const eggerZ = compareValues(eggerTest.z || eggerTest.t, R_RESULTS.publication_bias.egger.z, 'Egger z/t', 0.1);
+                const eggerP = compareValues(eggerTest.p, R_RESULTS.publication_bias.egger.p, 'Egger p-value', 0.05);
+
+                [eggerZ, eggerP].forEach(c => {
+                    totalCount++;
+                    if (c.pass) passCount++;
+                    const status = c.pass ? '<span class="pass">✓</span>' : '<span class="warn">~</span>';
+                    html += `<tr><td>Egger</td><td>${c.label}</td><td>${c.js.toFixed(4)}</td><td>${c.r.toFixed(4)}</td><td>${status}</td></tr>`;
+                });
+            }
+
+            if (beggTest) {
+                const beggTau = compareValues(beggTest.tau, R_RESULTS.publication_bias.begg.tau, 'Begg tau', 0.1);
+                const beggP = compareValues(beggTest.p, R_RESULTS.publication_bias.begg.p, 'Begg p-value', 0.1);
+
+                [beggTau, beggP].forEach(c => {
+                    totalCount++;
+                    if (c.pass) passCount++;
+                    const status = c.pass ? '<span class="pass">✓</span>' : '<span class="warn">~</span>';
+                    html += `<tr><td>Begg</td><td>${c.label}</td><td>${c.js.toFixed(4)}</td><td>${c.r.toFixed(4)}</td><td>${status}</td></tr>`;
+                });
+            }
+
+            html += '</table>';
+        } catch (e) {
+            html += `<p class="warn">Publication bias tests error: ${e.message}</p>`;
+        }
+
+        // Summary
+        const passRate = (passCount / totalCount * 100).toFixed(1);
+        const summaryClass = passRate > 90 ? 'pass' : passRate > 70 ? 'warn' : 'fail';
+
+        html += `
+        <div class="summary">
+            <h2>Benchmark Summary</h2>
+            <p>Tests Passed: <span class="${summaryClass}">${passCount} / ${totalCount} (${passRate}%)</span></p>
+            <p>Dataset: ${R_RESULTS.dataset} (${R_RESULTS.n_studies} studies)</p>
+            <p>Comparison against: metafor ${'{'}v4.8-0{'}'}, meta ${'{'}v8.2-1{'}'}</p>
+            <p>Tolerance: ${TOLERANCE} absolute or 0.1% relative difference</p>
+        </div>
+        `;
+
+        output.innerHTML = html;
+    }
+
+    // Run on load
+    window.onload = runBenchmark;
+    </script>
+</body>
+</html>
