@@ -39,7 +39,7 @@
   "notes": {
     "app": "PrognosisMeta v2.0",
     "data": "Three benchmark datasets, R metafor v4.8.0 reference values",
-    "code": "C:\\Projects\\prognostic-meta",
+    "code": "https://github.com/mahmood726-cyber/prognostic-meta",
     "doi": "",
     "version": "2.0",
     "date": "2026-03-26",

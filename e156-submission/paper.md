@@ -12,7 +12,7 @@ Type: methods
 Primary estimand: HR
 App: PrognosisMeta v2.0
 Data: Three benchmark datasets, R metafor v4.8.0 reference values
-Code: C:\Projects\prognostic-meta
+Code: https://github.com/mahmood726-cyber/prognostic-meta
 Version: 2.0
 Validation: DRAFT
 

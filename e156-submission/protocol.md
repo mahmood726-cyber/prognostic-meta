@@ -4,14 +4,14 @@ author@example.com
 
 Protocol: PrognosisMeta: Browser-Based Prognostic Meta-Analysis Engine
 
-This protocol describes the planned evidence synthesis for PrognosisMeta: Browser-Based Prognostic Meta-Analysis Engine, targeting transparent, reproducible estimation of HR in a versioned analytical workflow. Eligible inputs include published studies and validated computational outputs addressing the target estimand, with no restrictions on publication year, language, or clinical domain. Searches will cover PubMed, Embase, and the Cochrane Central Register using structured database strategies, manual reference-list screening, and duplicate full-text review before extraction. The primary analysis will estimate HR using Bayesian random-effects meta-analysis, reporting 95 percent credible intervals with prespecified robustness model checks. Heterogeneity will be summarised using I-squared and tau-squared, with prespecified sensitivity analyses across variance estimators, exclusion scenarios, and leave-one-out patterns. Analysis code will be versioned and archived at C:\Projects\prognostic-meta, and reporting will follow PRISMA 2020 guidance to support independent external verification and reuse. Anticipated limitations include publication bias, clinical and methodological heterogeneity, sparse outcome data in some settings, and the constraints of aggregate-level evidence reporting synthesis.
+This protocol describes the planned evidence synthesis for PrognosisMeta: Browser-Based Prognostic Meta-Analysis Engine, targeting transparent, reproducible estimation of HR in a versioned analytical workflow. Eligible inputs include published studies and validated computational outputs addressing the target estimand, with no restrictions on publication year, language, or clinical domain. Searches will cover PubMed, Embase, and the Cochrane Central Register using structured database strategies, manual reference-list screening, and duplicate full-text review before extraction. The primary analysis will estimate HR using Bayesian random-effects meta-analysis, reporting 95 percent credible intervals with prespecified robustness model checks. Heterogeneity will be summarised using I-squared and tau-squared, with prespecified sensitivity analyses across variance estimators, exclusion scenarios, and leave-one-out patterns. Analysis code will be versioned and archived at https://github.com/mahmood726-cyber/prognostic-meta, and reporting will follow PRISMA 2020 guidance to support independent external verification and reuse. Anticipated limitations include publication bias, clinical and methodological heterogeneity, sparse outcome data in some settings, and the constraints of aggregate-level evidence reporting synthesis.
 
 Outside Notes
 
 Type: protocol
 Primary estimand: HR
 App: PrognosisMeta v2.0
-Code: C:\Projects\prognostic-meta
+Code: https://github.com/mahmood726-cyber/prognostic-meta
 Date: 2026-03-26
 Validation: DRAFT
 

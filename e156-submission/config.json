@@ -3,7 +3,7 @@
   "slug": "prognosismeta-browser-engine",
   "author": "Mahmood Ahmad",
   "date": "2026-03-26",
-  "path": "C:\\Projects\\prognostic-meta",
+  "path": "/mnt/c/Projects/prognostic-meta",
   "type": "methods",
   "primary_estimand": "HR",
   "summary": "A 29,770-line JavaScript engine achieves 93.3% exact match with R metafor for prognostic meta-analysis.",
@@ -41,7 +41,7 @@
   "notes": {
     "app": "PrognosisMeta v2.0",
     "data": "Three benchmark datasets, R metafor v4.8.0 reference values",
-    "code": "C:\\Projects\\prognostic-meta",
+    "code": "https://github.com/mahmood726-cyber/prognostic-meta",
     "doi": "",
     "version": "2.0",
     "date": "2026-03-26",
