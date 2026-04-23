@@ -1810,7 +1810,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
                     </div>
                     <div class="form-grid">
                         <div class="form-group">
-                            <label>Prior for μ (mean)</label>
+                            <label for="prior-mu">Prior for μ (mean)</label>
                             <select id="prior-mu">
                                 <option value="normal">Normal(0, 10²)</option>
                                 <option value="uniform">Uniform(-10, 10)</option>
@@ -1818,7 +1818,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
                             </select>
                         </div>
                         <div class="form-group">
-                            <label>Prior for τ (SD)</label>
+                            <label for="prior-tau">Prior for τ (SD)</label>
                             <select id="prior-tau">
                                 <option value="halfnormal">Half-Normal(0, 1)</option>
                                 <option value="halfcauchy">Half-Cauchy(0, 0.5)</option>
@@ -1827,19 +1827,19 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
                             </select>
                         </div>
                         <div class="form-group">
-                            <label>MCMC Iterations</label>
+                            <label for="mcmc-iterations">MCMC Iterations</label>
                             <input type="number" id="mcmc-iterations" value="10000" min="1000" max="100000">
                         </div>
                         <div class="form-group">
-                            <label>Burn-in</label>
+                            <label for="mcmc-burnin">Burn-in</label>
                             <input type="number" id="mcmc-burnin" value="2000" min="100" max="50000">
                         </div>
                         <div class="form-group">
-                            <label>Chains</label>
+                            <label for="mcmc-chains">Chains</label>
                             <input type="number" id="mcmc-chains" value="4" min="1" max="8">
                         </div>
                         <div class="form-group">
-                            <label>Thinning</label>
+                            <label for="mcmc-thin">Thinning</label>
                             <input type="number" id="mcmc-thin" value="1" min="1" max="100">
                         </div>
                     </div>
@@ -2039,11 +2039,11 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
                                 <span>Sort by effect size</span>
                             </label>
                             <div class="form-group">
-                                <label>Null line</label>
+                                <label for="forest-null">Null line</label>
                                 <input type="number" id="forest-null" value="1" step="0.1">
                             </div>
                             <div class="form-group">
-                                <label>X-axis label</label>
+                                <label for="forest-xlabel">X-axis label</label>
                                 <input type="text" id="forest-xlabel" value="Effect Size">
                             </div>
                         </div>
@@ -2054,7 +2054,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
                         <h4>Funnel Plot Options</h4>
                         <div class="options-grid">
                             <div class="form-group">
-                                <label>Y-axis</label>
+                                <label for="funnel-yaxis">Y-axis</label>
                                 <select id="funnel-yaxis">
                                     <option value="se">Standard Error</option>
                                     <option value="var">Variance</option>
@@ -2202,7 +2202,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
                     <h3>Subgroup Analysis</h3>
                     <div class="form-section">
                         <div class="form-group">
-                            <label>Subgroup Variable</label>
+                            <label for="subgroup-var">Subgroup Variable</label>
                             <select id="subgroup-var">
                                 <option value="">-- Select variable --</option>
                             </select>
@@ -2237,13 +2237,13 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
                     <h3>Meta-Regression</h3>
                     <div class="form-section">
                         <div class="form-group">
-                            <label>Moderator Variables</label>
+                            <label for="metareg-vars">Moderator Variables</label>
                             <select id="metareg-vars" multiple>
                                 <!-- Populated dynamically -->
                             </select>
                         </div>
                         <div class="form-group">
-                            <label>Method</label>
+                            <label for="metareg-method">Method</label>
                             <select id="metareg-method">
                                 <option value="REML">REML</option>
                                 <option value="ML">ML</option>
@@ -2340,7 +2340,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
                     <h3>Model Settings</h3>
                     <div class="options-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem;">
                         <div class="form-group">
-                            <label>Model Type</label>
+                            <label for="dr-model-type">Model Type</label>
                             <select id="dr-model-type">
                                 <option value="linear">Linear</option>
                                 <option value="quadratic">Quadratic</option>
@@ -2359,7 +2359,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
                             </select>
                         </div>
                         <div class="form-group">
-                            <label>Tau² Estimator</label>
+                            <label for="dr-tau-estimator">Tau² Estimator</label>
                             <select id="dr-tau-estimator">
                                 <option value="REML" selected>REML (Recommended)</option>
                                 <option value="DL">DerSimonian-Laird</option>
@@ -2367,7 +2367,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
                             </select>
                         </div>
                         <div class="form-group">
-                            <label>Spline Knots</label>
+                            <label for="dr-knots">Spline Knots</label>
                             <select id="dr-knots">
                                 <option value="3" selected>3 knots</option>
                                 <option value="4">4 knots</option>
@@ -2375,7 +2375,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
                             </select>
                         </div>
                         <div class="form-group">
-                            <label>Reference Dose</label>
+                            <label for="dr-reference-dose">Reference Dose</label>
                             <input type="number" id="dr-reference-dose" value="0" step="any" style="width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 4px;" title="Dose value to use as reference (typically 0 or lowest dose)">
                         </div>
                     </div>
@@ -2383,13 +2383,13 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
                         <strong style="font-size: 0.875rem; color: #475569;">Advanced Options</strong>
                         <div style="display: flex; flex-wrap: wrap; gap: 1rem; margin-top: 0.5rem;">
                             <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.875rem; cursor: pointer;">
-                                <input type="checkbox" id="dr-one-stage"> One-stage pooling
+                                <input type="checkbox" id="dr-one-stage" aria-label="One-stage pooling"> One-stage pooling
                             </label>
                             <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.875rem; cursor: pointer;">
-                                <input type="checkbox" id="dr-decorrelated-q" checked> Decorrelated Q-test
+                                <input type="checkbox" id="dr-decorrelated-q" checked aria-label="Decorrelated Q-test"> Decorrelated Q-test
                             </label>
                             <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.875rem; cursor: pointer;">
-                                <input type="checkbox" id="dr-influence" checked> Influence diagnostics
+                                <input type="checkbox" id="dr-influence" checked aria-label="Influence diagnostics"> Influence diagnostics
                             </label>
                         </div>
                     </div>
@@ -2521,20 +2521,20 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
                     <h3>Analysis Settings</h3>
                     <div class="form-grid">
                         <div class="form-group">
-                            <label>Reference Treatment:</label>
+                            <label for="nma-reference">Reference Treatment:</label>
                             <select id="nma-reference">
                                 <option value="">Auto-select (most connections)</option>
                             </select>
                         </div>
                         <div class="form-group">
-                            <label>Model:</label>
+                            <label for="nma-model">Model:</label>
                             <select id="nma-model">
                                 <option value="random">Random Effects</option>
                                 <option value="fixed">Fixed Effect</option>
                             </select>
                         </div>
                         <div class="form-group">
-                            <label>Method:</label>
+                            <label for="nma-method">Method:</label>
                             <select id="nma-method">
                                 <option value="frequentist">Frequentist (Graph-theoretical)</option>
                                 <option value="bayesian">Bayesian MCMC</option>
@@ -2730,14 +2730,14 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
                     <h3>GRADE Quality of Evidence</h3>
                     <div class="form-grid">
                         <div class="form-group">
-                            <label>Study Design:</label>
+                            <label for="grade-design">Study Design:</label>
                             <select id="grade-design">
                                 <option value="rct">Randomized Controlled Trials</option>
                                 <option value="observational">Observational Studies</option>
                             </select>
                         </div>
                         <div class="form-group">
-                            <label>Risk of Bias:</label>
+                            <label for="grade-rob">Risk of Bias:</label>
                             <select id="grade-rob">
                                 <option value="no_concern">No serious concern</option>
                                 <option value="serious">Serious concern (-1)</option>
@@ -2745,7 +2745,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
                             </select>
                         </div>
                         <div class="form-group">
-                            <label>Inconsistency:</label>
+                            <label for="grade-inconsistency">Inconsistency:</label>
                             <select id="grade-inconsistency">
                                 <option value="no_concern">No serious concern</option>
                                 <option value="serious">Serious concern (-1)</option>
@@ -2753,7 +2753,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
                             </select>
                         </div>
                         <div class="form-group">
-                            <label>Indirectness:</label>
+                            <label for="grade-indirectness">Indirectness:</label>
                             <select id="grade-indirectness">
                                 <option value="no_concern">No serious concern</option>
                                 <option value="serious">Serious concern (-1)</option>
@@ -2761,7 +2761,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
                             </select>
                         </div>
                         <div class="form-group">
-                            <label>Imprecision:</label>
+                            <label for="grade-imprecision">Imprecision:</label>
                             <select id="grade-imprecision">
                                 <option value="no_concern">No serious concern</option>
                                 <option value="serious">Serious concern (-1)</option>
@@ -2769,7 +2769,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
                             </select>
                         </div>
                         <div class="form-group">
-                            <label>Publication Bias:</label>
+                            <label for="grade-pubbias">Publication Bias:</label>
                             <select id="grade-pubbias">
                                 <option value="no_concern">No serious concern</option>
                                 <option value="serious">Serious concern (-1)</option>
@@ -2820,7 +2820,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
                     <h3>Power Calculation</h3>
                     <div class="form-grid">
                         <div class="form-group">
-                            <label>Analysis Type:</label>
+                            <label for="power-type">Analysis Type:</label>
                             <select id="power-type">
                                 <option value="power">Calculate Power</option>
                                 <option value="studies">Required Number of Studies</option>
@@ -2828,27 +2828,27 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
                             </select>
                         </div>
                         <div class="form-group">
-                            <label>True Effect Size:</label>
+                            <label for="power-effect">True Effect Size:</label>
                             <input type="number" id="power-effect" value="0.5" step="0.1">
                         </div>
                         <div class="form-group">
-                            <label>Number of Studies (k):</label>
+                            <label for="power-k">Number of Studies (k):</label>
                             <input type="number" id="power-k" value="10" min="2">
                         </div>
                         <div class="form-group">
-                            <label>Average Sample Size per Study:</label>
+                            <label for="power-n">Average Sample Size per Study:</label>
                             <input type="number" id="power-n" value="50" min="10">
                         </div>
                         <div class="form-group">
-                            <label>Between-Study Variance (τ²):</label>
+                            <label for="power-tau2">Between-Study Variance (τ²):</label>
                             <input type="number" id="power-tau2" value="0.1" step="0.05" min="0">
                         </div>
                         <div class="form-group">
-                            <label>Target Power (for sample size calculations):</label>
+                            <label for="power-target">Target Power (for sample size calculations):</label>
                             <input type="number" id="power-target" value="0.80" step="0.05" min="0.5" max="0.99">
                         </div>
                         <div class="form-group">
-                            <label>Alpha Level:</label>
+                            <label for="power-alpha">Alpha Level:</label>
                             <select id="power-alpha">
                                 <option value="0.05">0.05</option>
                                 <option value="0.01">0.01</option>
@@ -2881,24 +2881,24 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
                     <p>Evaluate estimator performance through simulation</p>
                     <div class="form-grid">
                         <div class="form-group">
-                            <label>Number of Simulations:</label>
+                            <label for="sim-nsim">Number of Simulations:</label>
                             <input type="number" id="sim-nsim" value="1000" min="100" step="100">
                         </div>
                         <div class="form-group">
-                            <label>Studies per Meta-Analysis:</label>
+                            <label for="sim-k">Studies per Meta-Analysis:</label>
                             <input type="number" id="sim-k" value="10" min="2">
                         </div>
                         <div class="form-group">
-                            <label>True Effect:</label>
+                            <label for="sim-effect">True Effect:</label>
                             <input type="number" id="sim-effect" value="0.5" step="0.1">
                         </div>
                         <div class="form-group">
-                            <label>True τ²:</label>
+                            <label for="sim-tau2">True τ²:</label>
                             <input type="number" id="sim-tau2" value="0.1" step="0.05" min="0">
                         </div>
                         <div class="form-group">
-                            <label>Sample Size Range:</label>
-                            <input type="text" id="sim-n-range" value="30-100" placeholder="min-max">
+                            <label for="sim-n-range">Sample Size Range:</label>
+                            <input type="text" id="sim-n-range" value="30-100" aria-label="min-max" placeholder="min-max">
                         </div>
                         <div class="form-group">
                             <label class="checkbox-label">
@@ -2957,11 +2957,11 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
                     <p>Fit all possible subsets to identify influential studies and heterogeneity patterns</p>
                     <div class="form-grid">
                         <div class="form-group">
-                            <label>Max Combinations:</label>
+                            <label for="gosh-max">Max Combinations:</label>
                             <input type="number" id="gosh-max" value="10000" min="1000" step="1000">
                         </div>
                         <div class="form-group">
-                            <label>Min Studies per Subset:</label>
+                            <label for="gosh-min-k">Min Studies per Subset:</label>
                             <input type="number" id="gosh-min-k" value="2" min="2">
                         </div>
                     </div>
@@ -3033,14 +3033,14 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
                     <h3>Analysis Settings</h3>
                     <div class="form-grid">
                         <div class="form-group">
-                            <label>Analysis Approach:</label>
+                            <label for="ipd-approach">Analysis Approach:</label>
                             <select id="ipd-approach">
                                 <option value="two-stage">Two-Stage (aggregate per study, then pool)</option>
                                 <option value="one-stage">One-Stage (mixed-effects model)</option>
                             </select>
                         </div>
                         <div class="form-group">
-                            <label>Outcome Type:</label>
+                            <label for="ipd-outcome">Outcome Type:</label>
                             <select id="ipd-outcome">
                                 <option value="continuous">Continuous</option>
                                 <option value="binary">Binary</option>
@@ -3049,14 +3049,14 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
                             </select>
                         </div>
                         <div class="form-group">
-                            <label>Random Effects:</label>
+                            <label for="ipd-random">Random Effects:</label>
                             <select id="ipd-random">
                                 <option value="intercept">Random Intercept Only</option>
                                 <option value="slope">Random Intercept + Slope</option>
                             </select>
                         </div>
                         <div class="form-group">
-                            <label>Treatment Variable:</label>
+                            <label for="ipd-treatment-var">Treatment Variable:</label>
                             <select id="ipd-treatment-var">
                                 <option value="">-- Select --</option>
                             </select>
