@@ -1672,11 +1672,11 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
                     <h3>Analysis Type</h3>
                     <div class="radio-group">
                         <label class="radio-label">
-                            <input type="radio" name="analysis-type" value="prognostic" checked>
+                            <input type="radio" name="analysis-type" value="prognostic" checked aria-label="Prognostic Factor Meta-Analysis">
                             <span>Prognostic Factor Meta-Analysis</span>
                         </label>
                         <label class="radio-label">
-                            <input type="radio" name="analysis-type" value="prediction">
+                            <input type="radio" name="analysis-type" value="prediction" aria-label="Prediction Model Meta-Analysis">
                             <span>Prediction Model Meta-Analysis</span>
                         </label>
                     </div>
@@ -1686,7 +1686,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
                 <div id="prognostic-options" class="form-section">
                     <h3>Effect Measure</h3>
                     <div class="select-group">
-                        <select id="effect-measure">
+                        <select id="effect-measure" aria-label="Effect Measure">
                             <option value="HR">Hazard Ratio (HR)</option>
                             <option value="OR">Odds Ratio (OR)</option>
                             <option value="RR">Risk Ratio (RR)</option>
@@ -1699,7 +1699,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
                 <div id="prediction-options" class="form-section hidden">
                     <h3>Performance Metric</h3>
                     <div class="select-group">
-                        <select id="performance-metric">
+                        <select id="performance-metric" aria-label="Performance Metric">
                             <option value="cstat">C-statistic / AUC</option>
                             <option value="oe-ratio">O:E Ratio (Calibration)</option>
                             <option value="cal-slope">Calibration Slope</option>
@@ -1736,9 +1736,9 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
                 <div id="validation-messages" class="validation-panel"></div>
 
                 <!-- Hidden file inputs -->
-                <input type="file" id="file-input-csv" accept=".csv" hidden>
-                <input type="file" id="file-input-excel" accept=".xlsx,.xls" hidden>
-                <input type="file" id="file-input-project" accept=".json" hidden>
+                <input type="file" id="file-input-csv" accept=".csv" hidden aria-label="File input csv">
+                <input type="file" id="file-input-excel" accept=".xlsx,.xls" hidden aria-label="File input excel">
+                <input type="file" id="file-input-project" accept=".json" hidden aria-label="File input project">
             </section>
 
             <!-- Analysis Tab -->
@@ -1770,7 +1770,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
                 <div id="re-options" class="form-section">
                     <h3>Heterogeneity Estimator (τ²)</h3>
                     <div class="select-group">
-                        <select id="tau2-estimator">
+                        <select id="tau2-estimator" aria-label="Heterogeneity Estimator (τ²)">
                             <option value="DL">DerSimonian-Laird (DL)</option>
                             <option value="REML">Restricted Maximum Likelihood (REML)</option>
                             <option value="PM">Paule-Mandel (PM)</option>
@@ -1782,7 +1782,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
                         </select>
                     </div>
                     <label class="checkbox-label">
-                        <input type="checkbox" id="hksj-adjustment">
+                        <input type="checkbox" id="hksj-adjustment" aria-label="Apply Hartung-Knapp-Sidik-Jonkman adjustment">
                         <span>Apply Hartung-Knapp-Sidik-Jonkman adjustment</span>
                     </label>
                 </div>
@@ -1791,7 +1791,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
                 <div id="fe-options" class="form-section hidden">
                     <h3>Fixed Effect Method</h3>
                     <div class="select-group">
-                        <select id="fe-method">
+                        <select id="fe-method" aria-label="Fixed Effect Method">
                             <option value="IV">Inverse Variance</option>
                             <option value="MH">Mantel-Haenszel</option>
                             <option value="Peto">Peto</option>
@@ -1804,7 +1804,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
                     <h3>Bayesian Settings</h3>
                     <div class="form-group" style="margin-bottom: 1rem;">
                         <label class="checkbox-label">
-                            <input type="checkbox" id="use-robma">
+                            <input type="checkbox" id="use-robma" aria-label="Use RoBMA (Robust Bayesian Meta-Analysis with selection model averaging)">
                             <span>Use RoBMA (Robust Bayesian Meta-Analysis with selection model averaging)</span>
                         </label>
                     </div>
@@ -1849,11 +1849,11 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
                 <div class="form-section">
                     <h3>Confidence Level</h3>
                     <div class="form-group inline">
-                        <input type="number" id="conf-level" value="95" min="80" max="99" step="1">
+                        <input type="number" id="conf-level" value="95" min="80" max="99" step="1" aria-label="Confidence Level">
                         <span>%</span>
                     </div>
                     <label class="checkbox-label">
-                        <input type="checkbox" id="show-prediction" checked>
+                        <input type="checkbox" id="show-prediction" checked aria-label="Calculate prediction interval">
                         <span>Calculate prediction interval</span>
                     </label>
                 </div>
@@ -1863,19 +1863,19 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
                     <h3>Data Transformation</h3>
                     <div class="radio-group">
                         <label class="radio-label">
-                            <input type="radio" name="transform" value="auto" checked>
+                            <input type="radio" name="transform" value="auto" checked aria-label="Automatic (recommended)">
                             <span>Automatic (recommended)</span>
                         </label>
                         <label class="radio-label">
-                            <input type="radio" name="transform" value="log">
+                            <input type="radio" name="transform" value="log" aria-label="Log transformation">
                             <span>Log transformation</span>
                         </label>
                         <label class="radio-label">
-                            <input type="radio" name="transform" value="logit">
+                            <input type="radio" name="transform" value="logit" aria-label="Logit transformation">
                             <span>Logit transformation</span>
                         </label>
                         <label class="radio-label">
-                            <input type="radio" name="transform" value="none">
+                            <input type="radio" name="transform" value="none" aria-label="No transformation">
                             <span>No transformation</span>
                         </label>
                     </div>
@@ -2027,15 +2027,15 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
                         <h4>Forest Plot Options</h4>
                         <div class="options-grid">
                             <label class="checkbox-label">
-                                <input type="checkbox" id="forest-show-weights" checked>
+                                <input type="checkbox" id="forest-show-weights" checked aria-label="Show study weights">
                                 <span>Show study weights</span>
                             </label>
                             <label class="checkbox-label">
-                                <input type="checkbox" id="forest-show-pi" checked>
+                                <input type="checkbox" id="forest-show-pi" checked aria-label="Show prediction interval">
                                 <span>Show prediction interval</span>
                             </label>
                             <label class="checkbox-label">
-                                <input type="checkbox" id="forest-sort" checked>
+                                <input type="checkbox" id="forest-sort" checked aria-label="Sort by effect size">
                                 <span>Sort by effect size</span>
                             </label>
                             <div class="form-group">
@@ -2063,11 +2063,11 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
                                 </select>
                             </div>
                             <label class="checkbox-label">
-                                <input type="checkbox" id="funnel-contour">
+                                <input type="checkbox" id="funnel-contour" aria-label="Show contour-enhanced">
                                 <span>Show contour-enhanced</span>
                             </label>
                             <label class="checkbox-label">
-                                <input type="checkbox" id="funnel-trimfill">
+                                <input type="checkbox" id="funnel-trimfill" aria-label="Show trim-and-fill">
                                 <span>Show trim-and-fill</span>
                             </label>
                         </div>
@@ -2251,7 +2251,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
                             </select>
                         </div>
                         <label class="checkbox-label">
-                            <input type="checkbox" id="metareg-knha">
+                            <input type="checkbox" id="metareg-knha" aria-label="Knapp-Hartung adjustment">
                             <span>Knapp-Hartung adjustment</span>
                         </label>
                         <button id="btn-run-metareg" class="btn btn-primary">Run Meta-Regression</button>
@@ -2458,15 +2458,15 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
                     <h3>Dose-Response Curve</h3>
                     <div class="plot-options" style="margin-bottom: 1rem;">
                         <label class="checkbox-label" style="margin-right: 1rem;">
-                            <input type="checkbox" id="dr-show-ci" checked>
+                            <input type="checkbox" id="dr-show-ci" checked aria-label="Show 95% CI">
                             <span>Show 95% CI</span>
                         </label>
                         <label class="checkbox-label" style="margin-right: 1rem;">
-                            <input type="checkbox" id="dr-show-points" checked>
+                            <input type="checkbox" id="dr-show-points" checked aria-label="Show study points">
                             <span>Show study points</span>
                         </label>
                         <label class="checkbox-label">
-                            <input type="checkbox" id="dr-show-rug">
+                            <input type="checkbox" id="dr-show-rug" aria-label="Show dose distribution">
                             <span>Show dose distribution</span>
                         </label>
                     </div>
@@ -2542,7 +2542,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
                         </div>
                         <div class="form-group">
                             <label class="checkbox-label">
-                                <input type="checkbox" id="nma-inconsistency">
+                                <input type="checkbox" id="nma-inconsistency" aria-label="Assess inconsistency (node-splitting)">
                                 <span>Assess inconsistency (node-splitting)</span>
                             </label>
                         </div>
@@ -2657,27 +2657,27 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
                     <h3>Select Assessment Tool</h3>
                     <div class="radio-group">
                         <label class="radio-label">
-                            <input type="radio" name="rob-tool" value="rob2" checked>
+                            <input type="radio" name="rob-tool" value="rob2" checked aria-label="ROB-2 (RCTs)">
                             <span>ROB-2 (RCTs)</span>
                         </label>
                         <label class="radio-label">
-                            <input type="radio" name="rob-tool" value="robins_i">
+                            <input type="radio" name="rob-tool" value="robins_i" aria-label="ROBINS-I (Non-randomized)">
                             <span>ROBINS-I (Non-randomized)</span>
                         </label>
                         <label class="radio-label">
-                            <input type="radio" name="rob-tool" value="probast">
+                            <input type="radio" name="rob-tool" value="probast" aria-label="PROBAST (Prediction Models)">
                             <span>PROBAST (Prediction Models)</span>
                         </label>
                         <label class="radio-label">
-                            <input type="radio" name="rob-tool" value="quadas2">
+                            <input type="radio" name="rob-tool" value="quadas2" aria-label="QUADAS-2 (Diagnostic Accuracy)">
                             <span>QUADAS-2 (Diagnostic Accuracy)</span>
                         </label>
                         <label class="radio-label">
-                            <input type="radio" name="rob-tool" value="nos">
+                            <input type="radio" name="rob-tool" value="nos" aria-label="Newcastle-Ottawa Scale">
                             <span>Newcastle-Ottawa Scale</span>
                         </label>
                         <label class="radio-label">
-                            <input type="radio" name="rob-tool" value="grade">
+                            <input type="radio" name="rob-tool" value="grade" aria-label="GRADE Assessment">
                             <span>GRADE Assessment</span>
                         </label>
                     </div>
@@ -2692,7 +2692,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
                         <button id="btn-assess-all" class="btn btn-primary">Assess All Studies</button>
                     </div>
                     <div id="rob-assessment-form" class="hidden">
-                        <select id="rob-study-select">
+                        <select id="rob-study-select" aria-label="Risk of Bias Assessment">
                             <option value="">Select Study...</option>
                         </select>
                         <div id="rob-questions"></div>
@@ -2902,7 +2902,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
                         </div>
                         <div class="form-group">
                             <label class="checkbox-label">
-                                <input type="checkbox" id="sim-pub-bias">
+                                <input type="checkbox" id="sim-pub-bias" aria-label="Simulate Publication Bias">
                                 <span>Simulate Publication Bias</span>
                             </label>
                         </div>
@@ -2910,12 +2910,12 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
                     <div class="form-group">
                         <label>Methods to Compare:</label>
                         <div class="checkbox-grid">
-                            <label class="checkbox-label"><input type="checkbox" id="sim-method-dl" checked><span>DerSimonian-Laird</span></label>
-                            <label class="checkbox-label"><input type="checkbox" id="sim-method-reml" checked><span>REML</span></label>
-                            <label class="checkbox-label"><input type="checkbox" id="sim-method-pm" checked><span>Paule-Mandel</span></label>
-                            <label class="checkbox-label"><input type="checkbox" id="sim-method-hksj" checked><span>HKSJ</span></label>
-                            <label class="checkbox-label"><input type="checkbox" id="sim-method-ml"><span>ML</span></label>
-                            <label class="checkbox-label"><input type="checkbox" id="sim-method-hs"><span>Hunter-Schmidt</span></label>
+                            <label class="checkbox-label"><input type="checkbox" id="sim-method-dl" checked aria-label="REML"><span>DerSimonian-Laird</span></label>
+                            <label class="checkbox-label"><input type="checkbox" id="sim-method-reml" checked aria-label="Paule-Mandel"><span>REML</span></label>
+                            <label class="checkbox-label"><input type="checkbox" id="sim-method-pm" checked aria-label="HKSJ"><span>Paule-Mandel</span></label>
+                            <label class="checkbox-label"><input type="checkbox" id="sim-method-hksj" checked aria-label="ML"><span>HKSJ</span></label>
+                            <label class="checkbox-label"><input type="checkbox" id="sim-method-ml" aria-label="Hunter-Schmidt"><span>ML</span></label>
+                            <label class="checkbox-label"><input type="checkbox" id="sim-method-hs" aria-label="Methods to Compare:"><span>Hunter-Schmidt</span></label>
                         </div>
                     </div>
                     <button id="btn-run-simulation" class="btn btn-primary btn-large">Run Simulation</button>
@@ -3131,35 +3131,35 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
                         <h4>Include Sections:</h4>
                         <div class="checkbox-grid">
                             <label class="checkbox-label">
-                                <input type="checkbox" id="report-summary" checked>
+                                <input type="checkbox" id="report-summary" checked aria-label="Summary statistics">
                                 <span>Summary statistics</span>
                             </label>
                             <label class="checkbox-label">
-                                <input type="checkbox" id="report-forest" checked>
+                                <input type="checkbox" id="report-forest" checked aria-label="Forest plot">
                                 <span>Forest plot</span>
                             </label>
                             <label class="checkbox-label">
-                                <input type="checkbox" id="report-heterogeneity" checked>
+                                <input type="checkbox" id="report-heterogeneity" checked aria-label="Heterogeneity analysis">
                                 <span>Heterogeneity analysis</span>
                             </label>
                             <label class="checkbox-label">
-                                <input type="checkbox" id="report-funnel" checked>
+                                <input type="checkbox" id="report-funnel" checked aria-label="Funnel plot">
                                 <span>Funnel plot</span>
                             </label>
                             <label class="checkbox-label">
-                                <input type="checkbox" id="report-bias" checked>
+                                <input type="checkbox" id="report-bias" checked aria-label="Publication bias tests">
                                 <span>Publication bias tests</span>
                             </label>
                             <label class="checkbox-label">
-                                <input type="checkbox" id="report-subgroup">
+                                <input type="checkbox" id="report-subgroup" aria-label="Subgroup analysis">
                                 <span>Subgroup analysis</span>
                             </label>
                             <label class="checkbox-label">
-                                <input type="checkbox" id="report-metareg">
+                                <input type="checkbox" id="report-metareg" aria-label="Meta-regression">
                                 <span>Meta-regression</span>
                             </label>
                             <label class="checkbox-label">
-                                <input type="checkbox" id="report-sensitivity">
+                                <input type="checkbox" id="report-sensitivity" aria-label="Sensitivity analysis">
                                 <span>Sensitivity analysis</span>
                             </label>
                         </div>
