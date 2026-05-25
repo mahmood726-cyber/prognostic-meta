@@ -75,9 +75,9 @@ The code implements multiple CI approaches but documentation is unclear:
 3. **Profile likelihood CI**: Not implemented for tau²
 
 **Concerns**:
-- HKSJ can produce *narrower* CIs than standard when q < 1 (see IntHout et al. 2014)
+- HKSJ can produce *narrower* CIs than standard when q < 1 (see IntHout et al. 2014). doi:10.1186/1471-2288-14-25
 - No option for Jackson's Q-profile CI for tau²
-- Prediction intervals use simplified formula (Riley et al. 2011 recommended)
+- Prediction intervals use simplified formula (Riley et al. 2011 recommended). doi:10.1136/bmj.d549
 
 **Required Action**:
 ```
@@ -291,11 +291,11 @@ With these revisions, PrognosisMeta could become a valuable resource for systema
 
 ## References for Implementation Verification
 
-1. Viechtbauer W. (2010). Conducting meta-analyses in R with the metafor package. *Journal of Statistical Software*, 36(3), 1-48.
-2. Hedges LV, Tipton E, Johnson MC. (2010). Robust variance estimation in meta-regression with dependent effect size estimates. *Research Synthesis Methods*, 1(1), 39-65.
-3. IntHout J, Ioannidis JP, Borm GF. (2014). The Hartung-Knapp-Sidik-Jonkman method for random effects meta-analysis is straightforward and considerably outperforms the standard DerSimonian-Laird method. *BMC Medical Research Methodology*, 14, 25.
-4. Copas JB, Jackson D. (2004). A bound for publication bias based on the fraction of unpublished studies. *Biometrics*, 60(1), 146-153.
-5. Riley RD, Higgins JP, Deeks JJ. (2011). Interpretation of random effects meta-analyses. *BMJ*, 342, d549.
+1. Viechtbauer W. (2010). Conducting meta-analyses in R with the metafor package. *Journal of Statistical Software*, 36(3), 1-48. doi:10.18637/jss.v036.i03
+2. Hedges LV, Tipton E, Johnson MC. (2010). Robust variance estimation in meta-regression with dependent effect size estimates. *Research Synthesis Methods*, 1(1), 39-65. doi:10.1002/jrsm.5
+3. IntHout J, Ioannidis JP, Borm GF. (2014). The Hartung-Knapp-Sidik-Jonkman method for random effects meta-analysis is straightforward and considerably outperforms the standard DerSimonian-Laird method. *BMC Medical Research Methodology*, 14, 25. doi:10.1186/1471-2288-14-25
+4. Copas JB, Jackson D. (2004). A bound for publication bias based on the fraction of unpublished studies. *Biometrics*, 60(1), 146-153. doi:10.1111/j.0006-341X.2004.00161.x
+5. Riley RD, Higgins JP, Deeks JJ. (2011). Interpretation of random effects meta-analyses. *BMJ*, 342, d549. doi:10.1136/bmj.d549
 
 ---
 
