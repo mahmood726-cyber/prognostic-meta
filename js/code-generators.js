@@ -253,7 +253,7 @@ from scipy import stats
 
 # Data
 data = pd.DataFrame({
-    'study': [${data.map(d => `'${String(d.study || "Study").replace(/'/g, "\\'")}'`).join(', ')}],
+    'study': [${data.map(d => `'${String(d.study || "Study").replace(/\\/g, "\\\\").replace(/'/g, "\\'")}'`).join(', ')}],
     'yi': [${data.map(d => (d.yi || d.effect || 0).toFixed(6)).join(', ')}],
     'sei': [${data.map(d => (d.sei || d.se || 0.1).toFixed(6)).join(', ')}]
 })
