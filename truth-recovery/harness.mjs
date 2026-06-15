@@ -38,15 +38,17 @@ export function runCell({ Ctrue, tau, k, nReps, baseSeed }) {
     const { cstats, ses } = generateCstatStudies({
       Ctrue, tau, k, nEvents: 200, nControls: 400, seed: baseSeed + r,
     });
-    const z = poolCStatistics(cstats, ses, 'REML');
+    // BEFORE: legacy z-interval (the old production default, now opt-in via hksj:false)
+    const z = poolCStatistics(cstats, ses, 'REML', { hksj: false });
     if (!isFinite(z.pooledC) || !isFinite(z.cCI.lower) || !isFinite(z.cCI.upper)) continue;
-    const h = poolHKSJonLogit(cstats, ses, 'REML');
+    // AFTER: the NEW production default of poolCStatistics (HKSJ wired in)
+    const h = poolCStatistics(cstats, ses, 'REML');
     ok++;
     if (Ctrue >= z.cCI.lower && Ctrue <= z.cCI.upper) covZ++;
-    if (Ctrue >= h.lower && Ctrue <= h.upper) covH++;
+    if (Ctrue >= h.cCI.lower && Ctrue <= h.cCI.upper) covH++;
     biasSum += (z.pooledC - Ctrue);
     widthZ += (z.cCI.upper - z.cCI.lower);
-    widthH += (h.upper - h.lower);
+    widthH += (h.cCI.upper - h.cCI.lower);
   }
   return {
     tau, k, n: ok,

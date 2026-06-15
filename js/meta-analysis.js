@@ -1152,7 +1152,7 @@ const MetaAnalysis = (function() {
      * Transform: logit(C) = ln(C/(1-C))
      * SE on logit scale: SE/(C×(1-C)) via delta method
      */
-    function poolCStatistics(cstats, ses, method = 'REML') {
+    function poolCStatistics(cstats, ses, method = 'REML', options = {}) {
         // Transform to logit scale
         const logitC = cstats.map(c => Stats.logit(c));
 
@@ -1163,8 +1163,14 @@ const MetaAnalysis = (function() {
         });
         const logitVar = logitSE.map(se => se * se);
 
-        // Run meta-analysis on logit scale
-        const result = randomEffects(logitC, logitVar, method);
+        // Run meta-analysis on logit scale.
+        // HKSJ (truncated t-interval) is the DEFAULT for prediction-model metrics:
+        // the plain z-interval under-covers the true C by ~3-7pp under heterogeneity
+        // (truth-recovery measured). Pass {hksj:false} for the legacy z-interval.
+        const useHKSJ = options.hksj !== false;
+        const result = useHKSJ
+            ? randomEffectsHKSJ(logitC, logitVar, method, { truncate: true })
+            : randomEffects(logitC, logitVar, method);
 
         // Back-transform
         const pooledC = Stats.invLogit(result.effect);
@@ -1214,14 +1220,18 @@ const MetaAnalysis = (function() {
      * meta-analysis of prediction model performance. BMJ, 356, i6460.
      * Transform: log(O:E)
      */
-    function poolOERatios(oeRatios, ses, method = 'REML') {
+    function poolOERatios(oeRatios, ses, method = 'REML', options = {}) {
         // Transform to log scale (guard against zero O:E ratios)
         const logOE = oeRatios.map(oe => oe > 0 ? Math.log(oe) : -Infinity);
         const logSE = oeRatios.map((oe, i) => oe > 0 ? ses[i] / oe : Infinity);
         const logVar = logSE.map(se => se * se);
 
-        // Meta-analysis on log scale
-        const result = randomEffects(logOE, logVar, method);
+        // Meta-analysis on log scale. HKSJ default (see poolCStatistics);
+        // pass {hksj:false} for the legacy z-interval.
+        const useHKSJ = options.hksj !== false;
+        const result = useHKSJ
+            ? randomEffectsHKSJ(logOE, logVar, method, { truncate: true })
+            : randomEffects(logOE, logVar, method);
 
         // Back-transform
         const pooledOE = Math.exp(result.effect);

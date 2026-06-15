@@ -43,6 +43,10 @@ function ok(name, cond, detail = '') {
     cell.coverageZ < 0.93, `covZ=${(cell.coverageZ * 100).toFixed(1)}%`);
   ok('HKSJ recovers coverage better than z at k=5 high tau',
     cell.coverageHKSJ > cell.coverageZ, `covH=${(cell.coverageHKSJ * 100).toFixed(1)}% > covZ=${(cell.coverageZ * 100).toFixed(1)}%`);
+  // FIX: poolCStatistics now defaults to HKSJ -> the production default recovers
+  // nominal coverage in the exact cell where the old z-default failed.
+  ok('FIX: new poolCStatistics default (HKSJ) recovers >=94% at k=5 high tau',
+    cell.coverageHKSJ >= 0.94, `covDefault=${(cell.coverageHKSJ * 100).toFixed(1)}%`);
 }
 
 // 5. O:E ratio pooled on log scale is unbiased and back-transform is correct.

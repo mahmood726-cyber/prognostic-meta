@@ -67,11 +67,33 @@ prediction-model metrics. The HKSJ machinery already exists in the repo; this is
 dispatch change in each pooling function, not new statistics. After the change, re-run
 `node truth-recovery/harness.mjs` and confirm coverage >= 94% across the tau sweep.
 
+## Fix applied (truth-recovery-fix branch)
+`poolCStatistics` and `poolOERatios` in `js/meta-analysis.js` now route through
+`randomEffectsHKSJ` (truncated, t-interval df=k-1) by default; the legacy z-interval
+is reachable via `{ hksj: false }` (kept for before/after measurement and backward
+compatibility). The HKSJ machinery already existed in the repo — a dispatch change,
+not new statistics.
+
+**Measured before→after** (production `poolCStatistics`, C_true=0.75, 2000 reps/cell;
+"before" = `{hksj:false}` legacy z, "after" = new default):
+
+| tau  | k  | cov BEFORE (z) | cov AFTER (HKSJ default) |
+|------|----|---------------:|-------------------------:|
+| 0.15 | 5  | 92.0% | 97.8% |
+| 0.35 | 5  | 88.4% | 94.7% |
+| 0.15 | 10 | 91.8% | 95.1% |
+| 0.35 | 10 | 92.3% | 95.5% |
+| 0.35 | 20 | 93.5% | 95.5% |
+
+The default now lands at ~94–98% under heterogeneity (was 88–93%); at τ=0 it
+over-covers slightly (expected, homogeneous truth). `test-truth-recovery.mjs`
+extended with a FIX assertion (default ≥94% at the k=5/τ=0.35 cell); exit 0.
+
 ## Reproduce
 ```
-node truth-recovery/harness.mjs             # full coverage sweep
-node truth-recovery/test-truth-recovery.mjs # 6 assertions, exit 0 on pass
+node truth-recovery/harness.mjs             # before/after coverage sweep
+node truth-recovery/test-truth-recovery.mjs # 7 assertions, exit 0 on pass
 ```
-All code is ADDITIVE; no source function was modified. `engine.mjs` imports the repo's
-`statistics.js` + `meta-analysis.js` VERBATIM (installs the `Statistics` global the way
-`index.html` does) and re-exports the pooling functions.
+`engine.mjs` imports the repo's `statistics.js` + `meta-analysis.js` VERBATIM (installs
+the `Statistics` global the way `index.html` does) and re-exports the pooling functions,
+so the harness exercises the same code path the app does.
