@@ -655,9 +655,21 @@ const MetaAnalysis = (function() {
 
         // Confidence interval for I² (Higgins & Thompson)
         // Reference: Higgins JPT, Thompson SG. (2002). Statistics in Medicine.
-        const seLogH = (Q > k && k > 1) ?
-            0.5 * (Math.log(Q) - Math.log(k - 1)) /
-            (Math.sqrt(2 * Q) - Math.sqrt(Math.max(0, 2 * k - 3))) : 0;
+        // Two-branch SE[ln H]: large-Q form when Q > k, otherwise the
+        // small-sample form sqrt(1/(2(k-2)) * (1 - 1/(3(k-2)^2))) for k > 2.
+        // (The Q <= k branch previously returned 0, which produced a
+        //  degenerate zero-width I^2 CI even when Q > df, i.e. heterogeneity
+        //  is present.) The small-sample form is undefined for k <= 2, so
+        //  fall back to 0 there.
+        let seLogH;
+        if (Q > k && k > 1) {
+            seLogH = 0.5 * (Math.log(Q) - Math.log(k - 1)) /
+                (Math.sqrt(2 * Q) - Math.sqrt(Math.max(0, 2 * k - 3)));
+        } else if (k > 2) {
+            seLogH = Math.sqrt((1 / (2 * (k - 2))) * (1 - 1 / (3 * Math.pow(k - 2, 2))));
+        } else {
+            seLogH = 0;
+        }
 
         const H2Lower = Math.exp(2 * (Math.log(Math.sqrt(H2)) - 1.96 * seLogH));
         const H2Upper = Math.exp(2 * (Math.log(Math.sqrt(H2)) + 1.96 * seLogH));
@@ -935,6 +947,9 @@ const MetaAnalysis = (function() {
                 effect: NaN, se: NaN, variance: NaN, tau2: NaN, I2: NaN,
                 Q: { Q: NaN, df: 0, pValue: 1 },
                 ci: { lower: NaN, upper: NaN },
+                ci_lower: NaN, ci_upper: NaN,
+                predictionInterval: { lower: NaN, upper: NaN },
+                pi_lower: NaN, pi_upper: NaN,
                 error: 'Empty or invalid input arrays'
             };
         }

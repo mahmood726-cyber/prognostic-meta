@@ -278,7 +278,7 @@ const DataHandler = (function() {
                         study.originalEffect = hr;
                         study.originalLower = parseFloat(row.lower);
                         study.originalUpper = parseFloat(row.upper);
-                        study.events = parseFloat(row.events) || null;
+                        study.events = (v => Number.isFinite(v) ? v : null)(parseFloat(row.events));
                         break;
 
                     case 'OR':
@@ -412,7 +412,7 @@ const DataHandler = (function() {
                         study.originalSE = seCstat;
                         study.originalLower = row.lower ? parseFloat(row.lower) : cstat - 1.96 * seCstat;
                         study.originalUpper = row.upper ? parseFloat(row.upper) : cstat + 1.96 * seCstat;
-                        study.events = parseFloat(row.events) || null;
+                        study.events = (v => Number.isFinite(v) ? v : null)(parseFloat(row.events));
                         study.validation = row.validation || null;
                         break;
 
@@ -442,8 +442,8 @@ const DataHandler = (function() {
                         study.variance = seLogOE * seLogOE;
                         study.originalEffect = oe;
                         study.originalSE = seOE;
-                        study.observed = parseFloat(row.observed) || null;
-                        study.expected = parseFloat(row.expected) || null;
+                        study.observed = (v => Number.isFinite(v) ? v : null)(parseFloat(row.observed));
+                        study.expected = (v => Number.isFinite(v) ? v : null)(parseFloat(row.expected));
                         break;
 
                     case 'cal-slope':
